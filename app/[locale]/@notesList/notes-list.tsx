@@ -3,8 +3,9 @@
 import {Stack, TextField} from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import Note, {useNotes} from "@/app/_models/Note";
-import NoteCard from "@/app/[locale]/notes/note-card";
+import NoteCard, {AddNoteCard} from "@/app/[locale]/@notesList/note-card";
 import React, {useContext, useState} from "react";
+import {useScopedI18n} from "@/config/locales/client";
 
 export default function NotesList() {
     const {notes} = useContext(NotesListContext) as { notes: Note[] };
@@ -13,6 +14,7 @@ export default function NotesList() {
     return (
         <Stack className="w-1/4 pr-4 pt-4 pl-4 h-full overflow-y-scroll overflow-x-clip" gap={1}>
             <NotesSearch notes={notes} setSearchFilter={setSearchFilter}/>
+            <AddNoteCard />
             {
                 notes.filter(searchFilter).map(note => <NoteCard note={note} key={note.id}/>)
             }
@@ -42,9 +44,10 @@ export function NotesListProvider({children}: { children: React.ReactNode }) {
 
 function NotesSearch({notes, setSearchFilter}: { notes: Note[],
     setSearchFilter: React.Dispatch<React.SetStateAction<(note: Note) => boolean>> }) {
+    const scopedT = useScopedI18n("notesList");
     return <Autocomplete renderInput={(params) =>
         // @ts-ignore
-        <TextField {...params} placeholder="Search notes" fullWidth={true} variant="outlined"/>
+        <TextField {...params} placeholder={scopedT("search")} fullWidth={true} variant="outlined"/>
     } options={notes.map(note => note.title)} autoComplete freeSolo
     onInputChange={(ignored, value, reason) => {
         if (reason === "clear" || !value) {

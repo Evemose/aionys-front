@@ -1,9 +1,26 @@
 const en = {
     maximizedCard: {
-        noNoteSelected: 'No note selected',
+        title: 'Title',
+        content: 'Content',
+        saveButton: 'Save',
     },
     commons: {
         editedAt: 'edited',
+        edit: 'Edit',
+        save: 'Save',
+        delete: 'Delete'
+    },
+    notesList: {
+        search: 'Search @notesList',
+        addNote: 'Add note',
+    },
+    languageSelector: {
+        language: 'Language',
+    },
+    login: {
+        login: 'Login',
+        username: 'Username',
+        password: 'Password',
     }
 }
 

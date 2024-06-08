@@ -1,50 +1,22 @@
 
 export default class Note {
-    private readonly _id: number;
-    private _title: string;
-    private _content: string;
-    private readonly _createdAt: Date;
-    private readonly _lastModifiedAt: Date;
+    readonly id: number;
+    title: string;
+    content: string;
+    readonly createdAt: Date;
+    readonly lastModifiedAt: Date;
 
     constructor(id: number, title: string, content: string, createdDate: Date, lastModifiedDate: Date) {
-        this._id = id;
-        this._title = title;
-        this._content = content;
-        this._createdAt = createdDate;
-        this._lastModifiedAt = lastModifiedDate;
-    }
-
-    public get title(): string {
-        return this._title;
-    }
-
-    public get content(): string {
-        return this._content;
-    }
-
-    public get id(): number {
-        return this._id;
-    }
-
-    public get createdAt(): Date {
-        return this._createdAt;
-    }
-
-    public get lastModifiedAt(): Date {
-        return this._lastModifiedAt;
-    }
-
-    public set title(title: string) {
-        this._title = title;
-    }
-
-    public set content(content: string) {
-        this._content = content;
+        this.id = id;
+        this.title = title;
+        this.content = content;
+        this.createdAt = createdDate;
+        this.lastModifiedAt = lastModifiedDate;
     }
 }
 
 export function useNotes() {
-    // TODO: Fetch notes from the server
+    // TODO: Fetch @notesList from the server
     const shiftedDate = new Date();
     shiftedDate.setDate(shiftedDate.getDate() + 1);
     return [

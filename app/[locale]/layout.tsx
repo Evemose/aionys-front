@@ -1,18 +1,23 @@
 import "@/static/styles.css";
 import React from "react";
 import RootContext from "@/app/[locale]/_util/root-context";
+import {NotesListProvider} from "@/app/[locale]/@notesList/notes-list";
+import {Box} from "@mui/material";
 
 export default function LocaleLayout(
-    props: { children: React.ReactNode, header: React.ReactNode }
+    props: { header: React.ReactNode, selectedNote: React.ReactNode, notesList: React.ReactNode}
 ) {
     return (
-        <html lang="en">
-        <body className="h-dvh w-dvw overflow-x-clip">
         <RootContext>
-            {props.header}
-            {props.children}
+            <NotesListProvider>
+                <Box className="flex flex-col h-dvh">
+                    {props.header}
+                    <Box className="flex min-h-0">
+                        {props.notesList}
+                        {props.selectedNote}
+                    </Box>
+                </Box>
+            </NotesListProvider>
         </RootContext>
-        </body>
-        </html>
     )
 }
