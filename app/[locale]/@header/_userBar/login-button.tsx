@@ -2,34 +2,26 @@
 
 import React, {useState} from "react";
 import {useScopedI18n} from "@/config/locales/client";
-import {get, post} from "@/app/[locale]/_util/fetching";
-import ErrorResponse from "@/app/_models/Error";
-import {Backdrop, Button, FormHelperText, TextField, Typography} from "@mui/material";
+import {post} from "@/app/[locale]/_util/fetching";
+import ErrorResponse, {toMap} from "@/app/_models/Error";
+import {Backdrop, Button, TextField, Typography} from "@mui/material";
 import {Box} from "@mui/system";
 import {useRouter} from "next/navigation";
 // @ts-ignore
 import Cookies from "js-cookie";
+import {ErrorFormHelper} from "@/app/[locale]/_util/components";
 
-function ErrorFormHelper({errors, field}: { errors: Map<string, string>, field: "username" | "password" }) {
-    return <>
-        {
-            errors.has(field) &&
-            <FormHelperText error id={`${field}-helper`}>
-                {errors.get(field)}
-            </FormHelperText>
-        }
-    </>;
-}
-
-function useLoginHandler(setErrors: (value: (((prevState: Map<string, string>) => Map<string, string>) | Map<string, string>)) => void, setShowLoginDialog: (value: (((prevState: boolean) => boolean) | boolean)) => void) {
+function useLoginHandler(setErrors: (value: (((prevState: Map<string, string[]>) => Map<string, string[]>)
+                             | Map<string, string[]>)) => void,
+                         setShowLoginDialog: (value: (((prevState: boolean) => boolean) | boolean)) => void) {
     const router = useRouter();
 
     async function handleErrors(response: Response) {
         if (response.status == 400) {
             const errors = await response.json() as ErrorResponse[];
-            setErrors(new Map(errors.map(error => error.toMapEntry())));
+            setErrors(toMap(errors));
         } else if (response.status == 401) {
-            setErrors(new Map([["password", "Invalid password"]]));
+            setErrors(new Map([["password", ["Invalid password"]]]));
         } else {
             throw new Error("Unexpected error");
         }
@@ -60,7 +52,7 @@ function useLoginHandler(setErrors: (value: (((prevState: Map<string, string>) =
 
 export function LoginButton() {
     const [showLoginDialog, setShowLoginDialog] = useState(false);
-    const [errors, setErrors] = useState<Map<string, string>>(new Map());
+    const [errors, setErrors] = useState<Map<string, string[]>>(new Map());
     const scopedT = useScopedI18n("login");
 
     const handleSubmit = useLoginHandler(setErrors, setShowLoginDialog);

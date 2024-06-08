@@ -1,3 +1,4 @@
+import { z } from "zod";
 
 export default class Note {
     readonly id: number;
@@ -12,6 +13,18 @@ export default class Note {
         this.content = content;
         this.createdAt = createdDate;
         this.lastModifiedAt = lastModifiedDate;
+    }
+
+    public static fromResponseData(data: any): Note {
+        const schema = z.object({
+            id: z.number(),
+            title: z.string(),
+            content: z.string(),
+            createdAt: z.coerce.date(),
+            lastModifiedAt: z.coerce.date(),
+        });
+        const result = schema.parse(data);
+        return new Note(result.id, result.title, result.content, result.createdAt, result.lastModifiedAt);
     }
 }
 

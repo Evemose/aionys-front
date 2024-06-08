@@ -2,10 +2,11 @@
 
 import {Stack, TextField} from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
-import Note, {useNotes} from "@/app/_models/Note";
+import Note from "@/app/_models/Note";
 import NoteCard, {AddNoteCard} from "@/app/[locale]/@notesList/note-card";
 import React, {useContext, useState} from "react";
 import {useScopedI18n} from "@/config/locales/client";
+import {NotesListContext} from "@/app/[locale]/@notesList/notes-context";
 
 export default function NotesList() {
     const {notes} = useContext(NotesListContext) as { notes: Note[] };
@@ -19,26 +20,6 @@ export default function NotesList() {
                 notes.filter(searchFilter).map(note => <NoteCard note={note} key={note.id}/>)
             }
         </Stack>
-    )
-}
-
-export const NotesListContext = React.createContext(
-    {
-        notes: [],
-        setNotes: () => {
-            throw new Error("Notes context not initialized")
-        }
-    } as {
-        notes: Note[],
-        setNotes: (notes: Note[]) => void
-    });
-
-export function NotesListProvider({children}: { children: React.ReactNode }) {
-    const [notes, setNotes] = React.useState(useNotes());
-    return (
-        <NotesListContext.Provider value={{notes, setNotes}}>
-            {children}
-        </NotesListContext.Provider>
     )
 }
 

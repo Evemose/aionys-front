@@ -1,8 +1,8 @@
 import "@/static/styles.css";
 import React from "react";
 import RootContext from "@/app/[locale]/_util/root-context";
-import {NotesListProvider} from "@/app/[locale]/@notesList/notes-list";
 import {Box} from "@mui/material";
+import {NotesListProvider} from "@/app/[locale]/@notesList/notes-context";
 
 export default function LocaleLayout(
     props: { header: React.ReactNode, selectedNote: React.ReactNode, notesList: React.ReactNode}

@@ -11,7 +11,7 @@ const en = {
         delete: 'Delete'
     },
     notesList: {
-        search: 'Search @notesList',
+        search: 'Search notes',
         addNote: 'Add note',
     },
     languageSelector: {

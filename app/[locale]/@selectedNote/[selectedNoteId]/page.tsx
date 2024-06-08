@@ -7,9 +7,9 @@ import {Timestamp} from "@/app/[locale]/_util/components";
 import {useCurrentLocale, useScopedI18n} from "@/config/locales/client";
 import {Box} from "@mui/system";
 import {Check, Delete, Edit} from "@mui/icons-material";
-import {NotesListContext} from "@/app/[locale]/@notesList/notes-list";
 import {usePathname, useRouter, useSearchParams} from "next/navigation";
 import {getPathSegments} from "@/app/[locale]/_util/misc";
+import {NotesListContext} from "@/app/[locale]/@notesList/notes-context";
 
 function EditOrSaveButton({isEditing, setEditing}: { isEditing: boolean, setEditing: (isEditing: boolean) => void }) {
     const scopedT = useScopedI18n("commons");

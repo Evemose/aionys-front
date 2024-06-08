@@ -1,7 +1,8 @@
 "use client"
 
-import {Typography} from "@mui/material";
+import {FormHelperText, Typography} from "@mui/material";
 import {useScopedI18n} from "@/config/locales/client";
+import React from "react";
 
 
 export function Timestamp({createdAt, lastModifiedAt}: { createdAt: Date, lastModifiedAt: Date }) {
@@ -22,4 +23,16 @@ function toNormalDateFormat(date: Date): string {
     } as Intl.DateTimeFormatOptions
     const str = date.toLocaleDateString([], dateOptions)
     return str.replaceAll("/", ".")
+}
+
+export function ErrorFormHelper({errors, field}: { errors: Map<string, string[]>, field: any }) {
+    return <>
+        {
+            errors.has(field) &&
+            <FormHelperText error id={`${field}-helper`}>
+                {errors.get(field)!.map((error, index) =>
+                    <Typography key={index} variant="caption">{error}</Typography>)}
+            </FormHelperText>
+        }
+    </>;
 }

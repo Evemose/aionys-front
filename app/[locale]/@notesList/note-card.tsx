@@ -4,7 +4,7 @@ import Note from "@/app/_models/Note";
 import {Paper, Tooltip, Typography} from "@mui/material";
 import {Button} from "@mui/base";
 import {Timestamp} from "@/app/[locale]/_util/components";
-import {useContext} from "react";
+import React from "react";
 import {Add} from "@mui/icons-material";
 import {useScopedI18n} from "@/config/locales/client";
 import {useRouter} from "next/navigation";

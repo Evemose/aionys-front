@@ -4,7 +4,6 @@ import {LoginButton} from "@/app/[locale]/@header/_userBar/login-button";
 
 export default async function UserBar() {
     const user = await getCurrentUser();
-    console.log(user);
     return user ? <LoggedInBar user={user}/> : <LoginButton/>
 }
 
