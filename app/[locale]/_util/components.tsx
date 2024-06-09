@@ -1,29 +1,5 @@
-"use client"
-
-import {FormHelperText, Typography} from "@mui/material";
-import {useScopedI18n} from "@/config/locales/client";
+import {Box, FormHelperText, Typography} from "@mui/material";
 import React from "react";
-
-
-export function Timestamp({createdAt, lastModifiedAt}: { createdAt: Date, lastModifiedAt: Date }) {
-    const scopedT = useScopedI18n("commons")
-    return (
-        <Typography variant="caption">
-            {toNormalDateFormat(createdAt) +
-                (+lastModifiedAt !== +createdAt ? ` (${scopedT("editedAt")} 
-                ${toNormalDateFormat(lastModifiedAt)})` : "")}
-        </Typography>
-    )
-}
-
-// js date API is just horrible
-function toNormalDateFormat(date: Date): string {
-    const dateOptions = {
-        hour: '2-digit', minute: '2-digit', day: "2-digit", month: "2-digit", year: "numeric",
-    } as Intl.DateTimeFormatOptions
-    const str = date.toLocaleDateString([], dateOptions)
-    return str.replaceAll("/", ".")
-}
 
 export function ErrorFormHelper({errors, field}: { errors: Map<string, string[]>, field: any }) {
     return <>
@@ -35,4 +11,16 @@ export function ErrorFormHelper({errors, field}: { errors: Map<string, string[]>
             </FormHelperText>
         }
     </>;
+}
+
+export async function LoggedInOnlyContainer({children}: { children: React.ReactNode }) {
+    const cookies = (await import("next/headers")).cookies();
+    if (!cookies.get("Bearer")) {
+        return (
+            <Box className="flex justify-center items-center h-full">
+                <Typography variant="h3">You must be logged in to access this page.</Typography>
+            </Box>
+        );
+    }
+    return <>{children}</>
 }

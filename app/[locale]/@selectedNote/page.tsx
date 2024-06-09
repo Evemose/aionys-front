@@ -8,8 +8,8 @@ import {Button, TextField, Tooltip} from "@mui/material";
 import {Container} from "@/app/[locale]/@selectedNote/[selectedNoteId]/page";
 import {NotesListContext} from "@/app/[locale]/@notesList/notes-context";
 import {post} from "@/app/[locale]/_util/fetching";
-import {ErrorFormHelper} from "@/app/[locale]/_util/components";
 import ErrorResponse, {toMap} from "@/app/_models/Error";
+import {ErrorFormHelper} from "@/app/[locale]/_util/components";
 
 async function handlePostError(
     response: Response,

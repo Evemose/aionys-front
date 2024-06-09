@@ -1,4 +1,3 @@
-
 const BACKEND_URL = 'http://localhost:8080';
 
 async function getDefaultHeaders() {
@@ -42,3 +41,4 @@ async function getAuthCookie() {
     }
     return null;
 }
+

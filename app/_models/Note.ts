@@ -1,4 +1,5 @@
 import { z } from "zod";
+import {get} from "@/app/[locale]/_util/fetching";
 
 export default class Note {
     readonly id: number;
@@ -42,4 +43,12 @@ export function useNotes() {
         new Note(7, "Seventh note", "This is the seventh note", new Date(), new Date()),
         new Note(8, "Eighth note", "This is the eighth note", new Date(), new Date()),
     ];
+}
+
+export async function getNotes() {
+    const response = await get("/notes");
+    if (response.status !== 200) {
+        throw new Error("Failed to fetch notes");
+    }
+    return (await response.json()).map((note: any) => Note.fromResponseData(note));
 }

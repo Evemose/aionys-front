@@ -1,9 +1,9 @@
 "use client"
 
 import Note from "@/app/_models/Note";
-import React, {useContext, useRef} from "react";
+import React, {useContext, useEffect, useRef} from "react";
 import {IconButton, Paper, Tooltip, Typography} from "@mui/material";
-import {Timestamp} from "@/app/[locale]/_util/components";
+import {Timestamp} from "@/app/[locale]/_util/components-client";
 import {useCurrentLocale, useScopedI18n} from "@/config/locales/client";
 import {Box} from "@mui/system";
 import {Check, Delete, Edit} from "@mui/icons-material";
@@ -83,19 +83,25 @@ function SelectedNote() {
     const noteId = parseInt(pathSegments[pathSegments.length - 1]);
     const {notes, setNotes} =
         useContext(NotesListContext) as { notes: Note[], setNotes: (notes: Note[]) => void };
-    // use ref to store the note so that it does not re-render on every input
-    const tempNote = useRef(notes.find(n => n.id === noteId)!);
+    const tempNote = useRef(null) as unknown as React.MutableRefObject<Note>
 
+    useEffect(() => {
+        if (notes) {
+            tempNote.current = notes.find(n => n.id === noteId)!;
+        }
+    }, [noteId, notes]);
     return (
         <Container>
-            <Box component="form" className="flex" onSubmit={(e) => {
-                e.preventDefault();
-                setNotes(notes.map(n => n.id === noteId ? tempNote.current : n));
-            }}>
-                <NoteForm contentEditable={isEditing} noteRef={tempNote}/>
-                <EditOrSaveButton isEditing={isEditing} setEditing={setIsEditing}/>
-                <DeleteButton/>
-            </Box>
+            {
+                tempNote.current && <Box component="form" className="flex" onSubmit={(e) => {
+                    e.preventDefault();
+                    setNotes(notes.map(n => n.id === noteId ? tempNote.current : n));
+                }}>
+                    <NoteForm contentEditable={isEditing} noteRef={tempNote}/>
+                    <EditOrSaveButton isEditing={isEditing} setEditing={setIsEditing}/>
+                    <DeleteButton/>
+                </Box>
+            }
         </Container>
     );
 }

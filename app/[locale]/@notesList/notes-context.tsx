@@ -1,7 +1,10 @@
 "use client"
 
-import React from "react";
-import Note, {useNotes} from "@/app/_models/Note";
+import React, {useEffect, useState} from "react";
+import Note, {getNotes, useNotes} from "@/app/_models/Note";
+import useSWR from "swr";
+
+import {useGet} from "@/app/[locale]/_util/fetching-client";
 
 export const NotesListContext = React.createContext(
     {
@@ -14,10 +17,15 @@ export const NotesListContext = React.createContext(
         setNotes: (notes: Note[]) => void
     });
 
-export function NotesListProvider({children}: { children: React.ReactNode }) {
-    const [notes, setNotes] = React.useState(useNotes());
+
+export default function NotesListProvider({children}: { children: React.ReactNode }) {
+    const {data: notes} = useGet("/notes");
+    const [stateNotes, setNotes] = useState(notes);
+    useEffect(() => {
+        setNotes(notes?.map((note: any) => Note.fromResponseData(note)) ?? null)
+    }, [notes]);
     return (
-        <NotesListContext.Provider value={{notes, setNotes}}>
+        <NotesListContext.Provider value={{notes: stateNotes, setNotes}}>
             {children}
         </NotesListContext.Provider>
     )

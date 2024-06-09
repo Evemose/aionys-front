@@ -2,7 +2,7 @@ import "@/static/styles.css";
 import React from "react";
 
 
-export default function LocaleLayout(
+export default function MainLayout(
     props: { children: React.ReactNode }
 ) {
     return (

@@ -16,7 +16,7 @@ export default class User {
 export async function getCurrentUser() {
     const response = await get("/me");
     if (!response.ok) {
-        return null;
+        throw new Error("Failed to fetch user");
     }
     return await response.json() as User;
 }
