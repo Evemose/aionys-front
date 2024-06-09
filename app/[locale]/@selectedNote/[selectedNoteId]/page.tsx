@@ -10,6 +10,7 @@ import {Check, Delete, Edit} from "@mui/icons-material";
 import {usePathname, useRouter, useSearchParams} from "next/navigation";
 import {getPathSegments} from "@/app/[locale]/_util/misc";
 import {NotesListContext} from "@/app/[locale]/@notesList/notes-context";
+import LoadingSelectedNote from "@/app/[locale]/@selectedNote/[selectedNoteId]/loading-client";
 
 export function EditOrSaveButton({isEditing, setEditing}: { isEditing: boolean, setEditing: (isEditing: boolean) => void }) {
     const scopedT = useScopedI18n("commons");
@@ -77,7 +78,7 @@ export function DeleteButton() {
     );
 }
 
-async function SelectedNote() {
+function SelectedNote() {
     const [isEditing, setIsEditing] = useState(false);
     const pathSegments = getPathSegments(usePathname());
     const noteId = parseInt(pathSegments[pathSegments.length - 1]);
@@ -96,14 +97,14 @@ async function SelectedNote() {
     return (
         <Container>
             {
-                !loading && <Box component="form" className="flex" onSubmit={(e) => {
+                !loading ? <Box component="form" className="flex" onSubmit={(e) => {
                     e.preventDefault();
                     setNotes(notes.map(n => n.id === noteId ? tempNote.current : n));
                 }}>
                     <NoteForm contentEditable={isEditing} noteRef={tempNote}/>
                     <EditOrSaveButton isEditing={isEditing} setEditing={setIsEditing}/>
                     <DeleteButton/>
-                </Box>
+                </Box> : <LoadingSelectedNote box/>
             }
         </Container>
     );
@@ -112,7 +113,7 @@ async function SelectedNote() {
 // there is no realistic case when this would overflow because script runs on client
 let keyCounter = Number.MIN_VALUE;
 
-export default async function NoteMaximized() {
+export default function NoteMaximized() {
     return <SelectedNote key={keyCounter++}/>
 }
 

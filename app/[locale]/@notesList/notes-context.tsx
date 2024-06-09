@@ -18,7 +18,7 @@ export const NotesListContext = React.createContext(
     });
 
 
-export default async function NotesListProvider({children}: { children: React.ReactNode }) {
+export default function NotesListProvider({children}: { children: React.ReactNode }) {
     const {data: notes} = useGet("/notes");
     const [stateNotes, setNotes] = useState(notes);
     useEffect(() => {
