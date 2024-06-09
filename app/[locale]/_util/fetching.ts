@@ -34,6 +34,24 @@ export const get = async (url: string) => {
     });
 }
 
+export const patch = async (url: string, body: any) => {
+    return fetch(BACKEND_URL + url, {
+        method: 'PATCH',
+        headers: await getDefaultHeaders(),
+        body: JSON.stringify(body),
+        credentials: 'include'
+    });
+}
+
+export const del = async (url: string) => {
+    return fetch(BACKEND_URL + url, {
+        method: 'DELETE',
+        headers: await getDefaultHeaders(),
+        credentials: 'include'
+    });
+
+}
+
 async function getAuthCookie() {
     if (typeof window === 'undefined') {
         const cookies = (await import('next/headers')).cookies();
