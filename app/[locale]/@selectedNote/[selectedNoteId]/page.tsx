@@ -1,8 +1,8 @@
 "use client"
 
 import Note from "@/app/_models/Note";
-import React, {useContext, useEffect, useRef} from "react";
-import {IconButton, Paper, Tooltip, Typography} from "@mui/material";
+import React, {useContext, useEffect, useRef, useState} from "react";
+import {CircularProgress, IconButton, Paper, Tooltip, Typography} from "@mui/material";
 import {Timestamp} from "@/app/[locale]/_util/components-client";
 import {useCurrentLocale, useScopedI18n} from "@/config/locales/client";
 import {Box} from "@mui/system";
@@ -11,7 +11,7 @@ import {usePathname, useRouter, useSearchParams} from "next/navigation";
 import {getPathSegments} from "@/app/[locale]/_util/misc";
 import {NotesListContext} from "@/app/[locale]/@notesList/notes-context";
 
-function EditOrSaveButton({isEditing, setEditing}: { isEditing: boolean, setEditing: (isEditing: boolean) => void }) {
+export function EditOrSaveButton({isEditing, setEditing}: { isEditing: boolean, setEditing: (isEditing: boolean) => void }) {
     const scopedT = useScopedI18n("commons");
     return !isEditing ?
         <Tooltip title={scopedT("edit")}>
@@ -59,7 +59,7 @@ function NoteForm(props: {
     </Box>;
 }
 
-function DeleteButton() {
+export function DeleteButton() {
     const scopedT = useScopedI18n("commons");
     const noteId = parseInt(useSearchParams().get("selectedNoteId")!);
     const {notes, setNotes} = useContext(NotesListContext);
@@ -77,10 +77,11 @@ function DeleteButton() {
     );
 }
 
-function SelectedNote() {
-    const [isEditing, setIsEditing] = React.useState(false);
+async function SelectedNote() {
+    const [isEditing, setIsEditing] = useState(false);
     const pathSegments = getPathSegments(usePathname());
     const noteId = parseInt(pathSegments[pathSegments.length - 1]);
+    const [loading, setLoading] = useState(true);
     const {notes, setNotes} =
         useContext(NotesListContext) as { notes: Note[], setNotes: (notes: Note[]) => void };
     const tempNote = useRef(null) as unknown as React.MutableRefObject<Note>
@@ -88,12 +89,14 @@ function SelectedNote() {
     useEffect(() => {
         if (notes) {
             tempNote.current = notes.find(n => n.id === noteId)!;
+            setLoading(false);
         }
     }, [noteId, notes]);
+
     return (
         <Container>
             {
-                tempNote.current && <Box component="form" className="flex" onSubmit={(e) => {
+                !loading && <Box component="form" className="flex" onSubmit={(e) => {
                     e.preventDefault();
                     setNotes(notes.map(n => n.id === noteId ? tempNote.current : n));
                 }}>
@@ -109,7 +112,7 @@ function SelectedNote() {
 // there is no realistic case when this would overflow because script runs on client
 let keyCounter = Number.MIN_VALUE;
 
-export default function NoteMaximized() {
+export default async function NoteMaximized() {
     return <SelectedNote key={keyCounter++}/>
 }
 
