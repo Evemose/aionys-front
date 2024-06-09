@@ -1,20 +1,20 @@
 const BACKEND_URL = 'http://localhost:8080';
 
-async function getDefaultHeaders() {
+function getDefaultHeaders() {
     const headers = {
         'Content-Type': 'application/json',
     } as {
         [key: string]: string
     }
-    const authCookie = await getAuthCookie();
-    if (authCookie) {
-        headers['Cookie'] = `${authCookie.name}=${authCookie.value}`;
+    if (typeof window === 'undefined') {
+        const {cookies} = require('next/headers');
+        headers['Cookie'] = cookies().toString();
     }
     return headers;
 }
 
 export const post = async (url: string, body?: any, auth?: string) => {
-    const headers = await getDefaultHeaders();
+    const headers = getDefaultHeaders();
     if (auth) {
         headers['Authorization'] = auth;
     }
@@ -22,7 +22,7 @@ export const post = async (url: string, body?: any, auth?: string) => {
         method: 'POST',
         headers,
         body: JSON.stringify(body),
-        credentials: auth ? 'omit' : 'include'
+        credentials: 'include'
     });
 }
 
@@ -30,14 +30,14 @@ export const get = async (url: string) => {
     return fetch(BACKEND_URL + url, {
         method: 'GET',
         credentials: 'include',
-        headers: await getDefaultHeaders()
+        headers: getDefaultHeaders()
     });
 }
 
 export const patch = async (url: string, body: any) => {
     return fetch(BACKEND_URL + url, {
         method: 'PATCH',
-        headers: await getDefaultHeaders(),
+        headers: getDefaultHeaders(),
         body: JSON.stringify(body),
         credentials: 'include'
     });
@@ -46,17 +46,9 @@ export const patch = async (url: string, body: any) => {
 export const del = async (url: string) => {
     return fetch(BACKEND_URL + url, {
         method: 'DELETE',
-        headers: await getDefaultHeaders(),
+        headers: getDefaultHeaders(),
         credentials: 'include'
     });
 
-}
-
-async function getAuthCookie() {
-    if (typeof window === 'undefined') {
-        const cookies = (await import('next/headers')).cookies();
-        return cookies.get('Bearer');
-    }
-    return null;
 }
 

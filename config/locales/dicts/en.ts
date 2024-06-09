@@ -21,6 +21,9 @@ const en = {
         login: 'Login',
         username: 'Username',
         password: 'Password',
+    },
+    selectedNoteError: {
+        noteNotFound: 'Note not found',
     }
 }
 

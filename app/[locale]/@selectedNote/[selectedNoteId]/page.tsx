@@ -1,19 +1,18 @@
 "use client"
 
 import Note from "@/app/_models/Note";
-import React, {useContext, useEffect, useRef, useState} from "react";
+import React, {useContext, useEffect,  useState} from "react";
 import {IconButton, Paper, TextField, Tooltip, Typography} from "@mui/material";
 import {Timestamp} from "@/app/[locale]/_util/components-client";
 import {useCurrentLocale, useScopedI18n} from "@/config/locales/client";
 import {Box} from "@mui/system";
 import {Check, Delete, Edit} from "@mui/icons-material";
-import {usePathname, useRouter, useSearchParams} from "next/navigation";
-import {getPathSegments} from "@/app/[locale]/_util/misc";
+import {useRouter} from "next/navigation";
 import {NotesListContext} from "@/app/[locale]/@notesList/notes-context";
 import LoadingSelectedNote from "@/app/[locale]/@selectedNote/[selectedNoteId]/loading-client";
 import {del, patch} from "@/app/[locale]/_util/fetching";
 
-export function EditOrSaveButton({isEditing, setEditing}: {
+function EditOrSaveButton({isEditing, setEditing}: {
     isEditing: boolean,
     setEditing: (isEditing: boolean) => void
 }) {
@@ -120,7 +119,7 @@ function SelectedNote() {
                         title: formData.get("title") as string,
                         content: formData.get("content") as string
                     });
-                    if (response.status !== 200) {
+                    if (!response.ok) {
                         console.error(await response.json());
                         return;
                     }

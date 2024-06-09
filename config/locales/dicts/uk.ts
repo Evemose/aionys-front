@@ -20,6 +20,9 @@ const uk = {
         login: 'Увійти',
         username: 'Ім\'я користувача',
         password: 'Пароль',
+    },
+    selectedNoteError: {
+        noteNotFound: 'Нотатка не знайдена',
     }
 }
 

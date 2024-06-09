@@ -44,9 +44,9 @@ function useLoginHandler(setErrors: (value: (((prevState: Map<string, string[]>)
         }
 
         setShowLoginDialog(false);
-
-        const bearer = await response.text();
-        document.cookie = `Bearer=${bearer};path=/;expires=${new Date(Date.now() + 1000 * 60 * 60 * 24 * 7).toUTCString()};samesite=strict`;
+        for (const [key, value] of response.headers) {
+            console.log(key, value);
+        }
         router.refresh();
     };
 }
