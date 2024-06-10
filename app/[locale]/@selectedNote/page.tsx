@@ -28,8 +28,8 @@ async function handlePostError(
 }
 
 export default function AddNote() {
-    const scopedTMaximized = useScopedI18n("maximizedCard");
     const scopedTCommons = useScopedI18n("commons");
+    const scopedTNotes = useScopedI18n("noteFields");
     const {notes, setNotes} = useContext(NotesListContext);
     const [errors, setErrors] = useState<Map<string, string[]>>(new Map());
     return (
@@ -50,12 +50,12 @@ export default function AddNote() {
                      setNotes([...notes, Note.fromResponseData(await response.json())]);
                      currentTarget.reset();
                  }}>
-                <TextField label={scopedTMaximized("title")} variant="outlined"
+                <TextField label={scopedTNotes("title")} variant="outlined"
                            aria-label={"title-helper"}
                            name="title"
                 />
                 <ErrorFormHelper errors={errors} field={"title"}/>
-                <TextField label={scopedTMaximized("content")} variant="outlined" multiline
+                <TextField label={scopedTNotes("content")} variant="outlined" multiline
                            sx={{display: 'flex', flexGrow: 1}}
                            aria-label={"content-helper"}
                            InputProps={{

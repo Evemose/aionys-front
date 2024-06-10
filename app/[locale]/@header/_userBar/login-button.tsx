@@ -123,23 +123,24 @@ function RegisterForm(
 ) {
     const [errors, setErrors] = useState<Map<string, string[]>>(new Map());
     const handleSubmit = useRegisterHandler(setErrors, setCurrentBackdrop);
-    const scopedT = useScopedI18n("loginRegister");
+    const scopedTLoginRegister = useScopedI18n("loginRegister");
+    const scopedTUser = useScopedI18n("userFields")
     return (
         <Box onClick={(e) => e.stopPropagation()}
              className="bg-white w-[30dvw] h-[50dvh] rounded-xl flex justify-center items-center flex-col gap-2">
-            <Typography variant="h5">{scopedT("registerTitle")}</Typography>
+            <Typography variant="h5">{scopedTLoginRegister("registerTitle")}</Typography>
             <Box component="form" onSubmit={handleSubmit}
                  className="flex flex-col gap-2">
                 <ErrorFormHelper errors={errors} field="username"/>
-                <TextField name="username" label={scopedT("username")} aria-describedby="username-helper"/>
+                <TextField name="username" label={scopedTUser("username")} aria-describedby="username-helper"/>
                 <ErrorFormHelper errors={errors} field="password"/>
-                <TextField name="password" label={scopedT("password")} aria-describedby="password-helper"/>
-                <Button variant="contained" type="submit">{scopedT("register")}</Button>
+                <TextField name="password" label={scopedTUser("password")} aria-describedby="password-helper"/>
+                <Button variant="contained" type="submit">{scopedTLoginRegister("register")}</Button>
             </Box>
             <Button variant="text" style={{
                 textTransform: "none",
             }} onClick={() => setCurrentBackdrop(BackdropType.Login)}>
-                {scopedT("alreadyHaveAnAccount")}
+                {scopedTLoginRegister("alreadyHaveAnAccount")}
             </Button>
         </Box>
     )
@@ -155,23 +156,24 @@ function LoginForm(
     const [errors, setErrors]
         = useState<Map<string, string[]>>(new Map());
     const handleSubmit = useLoginHandler(setErrors, setCurrentBackdrop);
-    const scopedT = useScopedI18n("loginRegister");
+    const scopedTLoginRegister = useScopedI18n("loginRegister");
+    const scopedTUser = useScopedI18n("userFields");
     return (
         <Box onClick={(e) => e.stopPropagation()}
              className="bg-white w-[30dvw] h-[50dvh] rounded-xl flex justify-center items-center flex-col gap-2">
-            <Typography variant="h5">{scopedT("login")}</Typography>
+            <Typography variant="h5">{scopedTLoginRegister("login")}</Typography>
             <Box component="form" onSubmit={handleSubmit}
                  className="flex flex-col gap-2">
                 <ErrorFormHelper errors={errors} field="username"/>
-                <TextField name="username" label={scopedT("username")} aria-describedby="username-helper"/>
+                <TextField name="username" label={scopedTUser("username")} aria-describedby="username-helper"/>
                 <ErrorFormHelper errors={errors} field="password"/>
-                <TextField name="password" label={scopedT("password")} aria-describedby="password-helper"/>
-                <Button variant="contained" type="submit">{scopedT("login")}</Button>
+                <TextField name="password" label={scopedTUser("password")} aria-describedby="password-helper"/>
+                <Button variant="contained" type="submit">{scopedTLoginRegister("login")}</Button>
             </Box>
             <Button variant="text" style={{
                 textTransform: "none",
             }} onClick={() => setCurrentBackdrop(BackdropType.Register)}>
-                {scopedT("dontHaveAnAccount")}
+                {scopedTLoginRegister("dontHaveAnAccount")}
             </Button>
         </Box>
     )

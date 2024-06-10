@@ -75,19 +75,6 @@ export function DeleteButton() {
     );
 }
 
-const editableProps = new Map<string, any>([
-    ["title", {
-        variant: "outlined",
-        label: "Title",
-        name: "title"
-    }],
-    ["content", {
-        variant: "outlined",
-        label: "Content",
-        name: "content"
-    }]
-]);
-
 const nonEditableProps = new Map<string, any>([
     ["title", {
         variant: "h1"
@@ -104,6 +91,20 @@ function SelectedNote() {
     const {notes, setNotes} =
         useContext(NotesListContext) as { notes: Note[], setNotes: (notes: Note[]) => void };
     const note = notes?.find(n => n.id === noteId)!;
+    const scopedT = useScopedI18n("noteFields");
+
+    const editableProps = new Map<string, any>([
+        ["title", {
+            variant: "outlined",
+            label: scopedT("title"),
+            name: "title"
+        }],
+        ["content", {
+            variant: "outlined",
+            label: scopedT("content"),
+            name: "content"
+        }]
+    ]);
 
     useEffect(() => {
         if (notes) {

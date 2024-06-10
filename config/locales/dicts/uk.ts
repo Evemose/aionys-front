@@ -18,8 +18,6 @@ const uk = {
     },
     loginRegister: {
         login: 'Увійти',
-        username: 'Ім\'я користувача',
-        password: 'Пароль',
         register: 'Зареєструватися',
         registerTitle: 'Реєстрація',
         dontHaveAnAccount: 'Не маєте акаунту? Зареєструватися',
@@ -27,6 +25,14 @@ const uk = {
     },
     selectedNoteError: {
         noteNotFound: 'Нотатка не знайдена',
+    },
+    noteFields: {
+        title: 'Заголовок',
+        content: 'Текст',
+    },
+    userFields: {
+        username: 'Ім\'я користувача',
+        password: 'Пароль',
     }
 }
 

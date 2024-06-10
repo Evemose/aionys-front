@@ -1,8 +1,9 @@
 import User from "@/app/_models/User";
 import {Box} from "@mui/system";
 import {Avatar, Skeleton} from "@mui/material";
-import {Suspense, useState} from "react";
+import {Suspense} from "react";
 import Image from "next/image";
+import {Username} from "@/app/[locale]/@header/_userBar/user-options";
 
 async function ProfilePicture({profilePicture}: { profilePicture?: string }) {
     return (
@@ -10,12 +11,6 @@ async function ProfilePicture({profilePicture}: { profilePicture?: string }) {
             <Image src={profilePicture} alt={"Profile picture"} width={50} height={50}/> :
             <Avatar/>
     );
-}
-
-function Username(props: { name: string }) {
-    return (
-        <span>{props.name}</span>
-    )
 }
 
 export default function LoggedInBar({user}: { user: User }) {

@@ -1,9 +1,4 @@
 const en = {
-    maximizedCard: {
-        title: 'Title',
-        content: 'Content',
-        saveButton: 'Save',
-    },
     commons: {
         editedAt: 'edited',
         edit: 'Edit',
@@ -19,8 +14,6 @@ const en = {
     },
     loginRegister: {
         login: 'Login',
-        username: 'Username',
-        password: 'Password',
         register: 'Register',
         registerTitle: 'Registration',
         dontHaveAnAccount: 'Don\'t have an account? Register',
@@ -28,6 +21,14 @@ const en = {
     },
     selectedNoteError: {
         noteNotFound: 'Note not found',
+    },
+    noteFields: {
+        title: 'Title',
+        content: 'Content',
+    },
+    userFields: {
+        username: 'Username',
+        password: 'Password',
     }
 }
 
