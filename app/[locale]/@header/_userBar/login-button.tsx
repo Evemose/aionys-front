@@ -7,14 +7,38 @@ import ErrorResponse, {toMap} from "@/app/_models/Error";
 import {Backdrop, Button, TextField, Typography} from "@mui/material";
 import {Box} from "@mui/system";
 import {useRouter} from "next/navigation";
-// @ts-ignore
-import Cookies from "js-cookie";
 
 import {ErrorFormHelper} from "@/app/[locale]/_util/components";
 
-function useLoginHandler(setErrors: (value: (((prevState: Map<string, string[]>) => Map<string, string[]>)
-                             | Map<string, string[]>)) => void,
-                         setShowLoginDialog: (value: (((prevState: boolean) => boolean) | boolean)) => void) {
+const enum BackdropType {
+    Login = "login",
+    Register = "register",
+    None = "none"
+}
+
+const login = async (
+    form: HTMLFormElement,
+    router: any,
+    setCurrentBackdrop: (value: BackdropType) => void,
+    handleErrors: (response: Response) => Promise<void>
+) => {
+    const formData = new FormData(form);
+    const response = await post("/login", {},
+        `Basic ${btoa(`${formData.get("username")}:${formData.get("password")}`)}`);
+
+    if (!response.ok) {
+        await handleErrors(response);
+        return;
+    }
+
+    setCurrentBackdrop(BackdropType.None);
+    router.refresh();
+};
+
+function useLoginHandler(
+    setErrors: (value: Map<string, string[]>) => void,
+    setCurrentBackdrop: (value: BackdropType) => void,
+    ) {
     const router = useRouter();
 
     async function handleErrors(response: Response) {
@@ -30,53 +54,125 @@ function useLoginHandler(setErrors: (value: (((prevState: Map<string, string[]>)
 
     return async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        await login(e.currentTarget, router, setCurrentBackdrop, handleErrors);
+    }
+}
+
+export function LoginButton() {
+    const [currentBackdrop, setCurrentBackdrop]
+        = useState<BackdropType>(BackdropType.None);
+    const scopedT = useScopedI18n("loginRegister");
+    return (
+        <>
+            <Button onClick={() => setCurrentBackdrop(BackdropType.Login)} variant="contained">
+                {scopedT("login")}
+            </Button>
+            <Backdrop open={currentBackdrop !== BackdropType.None}
+                      onClick={() => setCurrentBackdrop(BackdropType.None)}>
+                {
+                    currentBackdrop === BackdropType.Login && <LoginForm setCurrentBackdrop={setCurrentBackdrop}/>
+                }
+                {
+                    currentBackdrop === BackdropType.Register && <RegisterForm setCurrentBackdrop={setCurrentBackdrop}/>
+                }
+            </Backdrop>
+        </>
+    )
+}
+
+function useRegisterHandler(
+    setErrors: (value: Map<string, string[]>) => void,
+    setCurrentBackdrop: (value: BackdropType) => void) {
+    const router = useRouter();
+
+    async function handleErrors(response: Response) {
+        if (response.status == 400 || response.status == 409) {
+            const errors = await response.json() as ErrorResponse[];
+            setErrors(toMap(errors));
+        } else {
+            console.log(response);
+            throw new Error("Unexpected error");
+        }
+    }
+
+    return async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
         const form = e.currentTarget;
         const formData = new FormData(form);
-        const username = formData.get("username") as string;
-        const password = formData.get("password") as string;
 
-        const response = await post("/login", {},
-            `Basic ${btoa(`${username}:${password}`)}`);
+        const response = await post("/register", {
+            username: formData.get("username"),
+            password: formData.get("password")
+        });
 
         if (!response.ok) {
             await handleErrors(response);
             return;
         }
 
-        setShowLoginDialog(false);
-        for (const [key, value] of response.headers) {
-            console.log(key, value);
-        }
-        router.refresh();
+        await login(form, router, setCurrentBackdrop, handleErrors);
     };
 }
 
-export function LoginButton() {
-    const [showLoginDialog, setShowLoginDialog] = useState(false);
+function RegisterForm(
+    {
+        setCurrentBackdrop
+    }: {
+        setCurrentBackdrop: (value: BackdropType) => void
+    }
+) {
     const [errors, setErrors] = useState<Map<string, string[]>>(new Map());
-    const scopedT = useScopedI18n("login");
-
-    const handleSubmit = useLoginHandler(setErrors, setShowLoginDialog);
-
+    const handleSubmit = useRegisterHandler(setErrors, setCurrentBackdrop);
+    const scopedT = useScopedI18n("loginRegister");
     return (
-        <>
-            <Button onClick={() => setShowLoginDialog(true)} variant="contained">
-                {scopedT("login")}
+        <Box onClick={(e) => e.stopPropagation()}
+             className="bg-white w-[30dvw] h-[50dvh] rounded-xl flex justify-center items-center flex-col gap-2">
+            <Typography variant="h5">{scopedT("registerTitle")}</Typography>
+            <Box component="form" onSubmit={handleSubmit}
+                 className="flex flex-col gap-2">
+                <ErrorFormHelper errors={errors} field="username"/>
+                <TextField name="username" label={scopedT("username")} aria-describedby="username-helper"/>
+                <ErrorFormHelper errors={errors} field="password"/>
+                <TextField name="password" label={scopedT("password")} aria-describedby="password-helper"/>
+                <Button variant="contained" type="submit">{scopedT("register")}</Button>
+            </Box>
+            <Button variant="text" style={{
+                textTransform: "none",
+            }} onClick={() => setCurrentBackdrop(BackdropType.Login)}>
+                {scopedT("alreadyHaveAnAccount")}
             </Button>
-            <Backdrop open={showLoginDialog} onClick={() => setShowLoginDialog(false)}>
-                <Box onClick={(e) => e.stopPropagation()}
-                     className="bg-white w-[30dvw] h-[50dvh] rounded-xl flex justify-center items-center flex-col gap-2">
-                    <Typography variant="h5">{scopedT("login")}</Typography>
-                    <Box component="form" onSubmit={handleSubmit}
-                         className="flex flex-col gap-2">
-                        <ErrorFormHelper errors={errors} field="username"/>
-                        <TextField name="username" label={scopedT("username")} aria-describedby="username-helper"/>
-                        <ErrorFormHelper errors={errors} field="password"/>
-                        <TextField name="password" label={scopedT("password")} aria-describedby="password-helper"/>
-                        <Button variant="contained" type="submit">{scopedT("login")}</Button>
-                    </Box>
-                </Box>
-            </Backdrop>
-        </>
+        </Box>
+    )
+}
+
+function LoginForm(
+    {
+        setCurrentBackdrop
+    }: {
+        setCurrentBackdrop: (value: BackdropType) => void
+    }
+) {
+    const [errors, setErrors]
+        = useState<Map<string, string[]>>(new Map());
+    const handleSubmit = useLoginHandler(setErrors, setCurrentBackdrop);
+    const scopedT = useScopedI18n("loginRegister");
+    return (
+        <Box onClick={(e) => e.stopPropagation()}
+             className="bg-white w-[30dvw] h-[50dvh] rounded-xl flex justify-center items-center flex-col gap-2">
+            <Typography variant="h5">{scopedT("login")}</Typography>
+            <Box component="form" onSubmit={handleSubmit}
+                 className="flex flex-col gap-2">
+                <ErrorFormHelper errors={errors} field="username"/>
+                <TextField name="username" label={scopedT("username")} aria-describedby="username-helper"/>
+                <ErrorFormHelper errors={errors} field="password"/>
+                <TextField name="password" label={scopedT("password")} aria-describedby="password-helper"/>
+                <Button variant="contained" type="submit">{scopedT("login")}</Button>
+            </Box>
+            <Button variant="text" style={{
+                textTransform: "none",
+            }} onClick={() => setCurrentBackdrop(BackdropType.Register)}>
+                {scopedT("dontHaveAnAccount")}
+            </Button>
+        </Box>
     )
 }

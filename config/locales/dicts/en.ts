@@ -17,10 +17,14 @@ const en = {
     languageSelector: {
         language: 'Language',
     },
-    login: {
+    loginRegister: {
         login: 'Login',
         username: 'Username',
         password: 'Password',
+        register: 'Register',
+        registerTitle: 'Registration',
+        dontHaveAnAccount: 'Don\'t have an account? Register',
+        alreadyHaveAnAccount: 'Already have an account? Login',
     },
     selectedNoteError: {
         noteNotFound: 'Note not found',

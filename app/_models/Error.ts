@@ -14,8 +14,11 @@ export default class ErrorResponse {
     }
 }
 
-export function toMap(errors: ErrorResponse[]): Map<string, string[]> {
+export function toMap(errors: ErrorResponse[] | ErrorResponse): Map<string, string[]> {
     const newErrors = new Map();
+    if (!Array.isArray(errors)) {
+        errors = [errors];
+    }
     for (const error of errors) {
         if (newErrors.has(error.field)) {
             newErrors.get(error.field)!.push(capitalizeFirstLetter(error.message));

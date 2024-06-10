@@ -15,7 +15,7 @@ export function ErrorFormHelper({errors, field}: { errors: Map<string, string[]>
 
 export async function LoggedInOnlyContainer({children}: { children: React.ReactNode }) {
     const cookies = (await import("next/headers")).cookies();
-    if (!cookies.get("Bearer")) {
+    if (!cookies.get("BearerTail")) {
         return (
             <Box className="flex justify-center items-center h-full">
                 <Typography variant="h3">You must be logged in to access this page.</Typography>

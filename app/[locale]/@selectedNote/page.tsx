@@ -30,26 +30,29 @@ async function handlePostError(
 export default function AddNote() {
     const scopedTMaximized = useScopedI18n("maximizedCard");
     const scopedTCommons = useScopedI18n("commons");
-    const newNoteRef = useRef(new Note(-1, "", "", new Date(), new Date()));
     const {notes, setNotes} = useContext(NotesListContext);
     const [errors, setErrors] = useState<Map<string, string[]>>(new Map());
     return (
         <Container>
             <Box className="flex flex-col gap-2 h-full overflow-y-auto pt-1.5" component="form"
                  onSubmit={async (e) => {
-                     e.preventDefault()
-                     const response = await post("/notes", newNoteRef.current);
-                     if (response.status !== 201) {
+                     e.preventDefault();
+                     const currentTarget = e.currentTarget;
+                     const formData = new FormData(currentTarget);
+                     const response = await post("/notes", {
+                         title: formData.get("title") as string,
+                         content: formData.get("content") as string,
+                     });
+                     if (!response.ok) {
                          await handlePostError(response, setErrors);
                          return;
                      }
                      setNotes([...notes, Note.fromResponseData(await response.json())]);
+                     currentTarget.reset();
                  }}>
                 <TextField label={scopedTMaximized("title")} variant="outlined"
-                           onChange={(e) => {
-                               newNoteRef.current.title = e.target.value ?? "";
-                           }}
                            aria-label={"title-helper"}
+                           name="title"
                 />
                 <ErrorFormHelper errors={errors} field={"title"}/>
                 <TextField label={scopedTMaximized("content")} variant="outlined" multiline
@@ -62,9 +65,7 @@ export default function AddNote() {
                                    alignItems: "flex-start"
                                }
                            }}
-                           onChange={(e) => {
-                               newNoteRef.current.content = e.target.value ?? "";
-                           }}
+                           name="content"
                 />
                 <ErrorFormHelper errors={errors} field={"content"}/>
                 <Tooltip title={scopedTCommons("save")}>

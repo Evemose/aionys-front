@@ -58,14 +58,16 @@ export function DeleteButton() {
     const currentLocale = useCurrentLocale();
     return (
         <Tooltip title={scopedT("delete")}>
-            <IconButton onClick={async () => {
-                const response = await del(`/notes/${noteId}`);
-                if (!response.ok) {
-                    console.error(response);
-                    return;
-                }
-                setNotes(notes.filter(n => n.id !== noteId));
-                router.push(`/${currentLocale}`)
+            <IconButton onClick={(e) => {
+                e.preventDefault();
+                del(`/notes/${noteId}`).then(response => {
+                    if (!response.ok) {
+                        console.error(response);
+                        return;
+                    }
+                    setNotes(notes.filter(n => n.id !== noteId));
+                });
+                router.push(`/${currentLocale}`);
             }} className="self-start">
                 <Delete/>
             </IconButton>

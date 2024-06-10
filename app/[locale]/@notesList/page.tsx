@@ -16,7 +16,6 @@ export default function NotesList() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        console.log(notes);
         if (notes) {
             setLoading(false);
         }
