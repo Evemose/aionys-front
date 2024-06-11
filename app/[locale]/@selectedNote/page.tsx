@@ -1,11 +1,11 @@
 "use client"
 
 import {useScopedI18n} from "@/config/locales/client";
-import React, {useContext, useRef, useState} from "react";
+import React, {useState} from "react";
 import Note from "@/app/_models/Note";
 import {Box} from "@mui/system";
 import {Button, TextField, Tooltip} from "@mui/material";
-import {NotesListContext} from "@/app/[locale]/@notesList/notes-context";
+import {useNotesList} from "@/app/[locale]/@notesList/notes-context";
 import {post} from "@/app/[locale]/_util/fetching";
 import ErrorResponse, {toMap} from "@/app/_models/Error";
 
@@ -31,7 +31,7 @@ async function handlePostError(
 export default function AddNote() {
     const scopedTCommons = useScopedI18n("commons");
     const scopedTNotes = useScopedI18n("noteFields");
-    const {notes, setNotes} = useContext(NotesListContext);
+    const add = useNotesList(state => state.push);
     const [errors, setErrors] = useState<Map<string, string[]>>(new Map());
     return (
         <Container>
@@ -48,7 +48,7 @@ export default function AddNote() {
                          await handlePostError(response, setErrors);
                          return;
                      }
-                     setNotes([...(notes ?? []), Note.fromResponseData(await response.json())]);
+                     add(Note.fromResponseData(await response.json()));
                      currentTarget.reset();
                  }}>
                 <TextField label={scopedTNotes("title")} variant="outlined"

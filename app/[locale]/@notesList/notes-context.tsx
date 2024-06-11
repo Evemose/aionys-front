@@ -1,50 +1,66 @@
 "use client"
 
-import React, {useEffect, useState} from "react";
+import React, {useEffect} from "react";
 import Note from "@/app/_models/Note";
-
 import {useGet} from "@/app/[locale]/_util/fetching-client";
+import {create} from "zustand";
 
-export const NotesListContext = React.createContext(
-    {
-        notes: [],
-        setNotes: () => {
-            throw new Error("Notes context not initialized")
+type NotesState = {
+    notes: Note[] | null,
+    removeById: (noteId: number) => void,
+    update: (note: Note) => void,
+    push: (note: Note) => void,
+    pushAll: (notes: Note[]) => void,
+    clear: () => void
+};
+
+export const useNotesList = create<NotesState>((set) => ({
+    notes: null,
+    removeById: (noteId: number) => set((state) => {
+        if (state.notes) {
+            return {notes: state.notes.filter((n) => n.id !== noteId)};
         }
-    } as {
-        notes: Note[] | null,
-        setNotes: (notes: Note[]) => void
-    });
+        return state;
+    }),
+    update: (note: Note) => set((state) => {
+        if (state.notes) {
+            return {notes: state.notes.map((n) => n.id === note.id ? note : n)};
+        }
+        return state;
+    }),
+    push: (note: Note) => set((state) => {
+        if (!state.notes) {
+            state.notes = [];
+        }
+        return {notes: [...state.notes, note]};
+    }),
+    pushAll: (notes: Note[]) => set((state) => {
+        if (!state.notes) {
+            state.notes = [];
+        }
+        return {notes: [...state.notes, ...notes]};
+    }),
+    clear: () => set({notes: null})
+}));
 
 
 export default function NotesListProvider({children}: { children: React.ReactNode }) {
     const {data: notes} = useGet("/notes");
-    return (
-        <NotesListInner notes={notes}>
-            {children}
-        </NotesListInner>
-    )
-}
-
-function NotesListInner({children, notes}: { children: React.ReactNode, notes?: Note[] }) {
-    const [stateNotes, setNotes] = useState(notes as Note[] | null);
+    const {pushAll, clear} = useNotesList(state => {
+        return {
+            clear: state.clear,
+            pushAll: state.pushAll
+        }
+    });
 
     useEffect(() => {
         if (notes) {
-            setNotes((stateNotes) => {
-                return (stateNotes ?? []).concat(
-                    notes.map(note => Note.fromResponseData(note))
-                        .filter((note) => !stateNotes?.some((n) => n.id === note.id))
-                );
-            });
+            pushAll(notes);
         } else {
-            setNotes(null); // reset notes
+            // only happens when page is refreshed
+            clear();
         }
-    }, [notes]);
+    }, [clear, notes, pushAll]);
 
-    return (
-        <NotesListContext.Provider value={{notes: stateNotes ?? null, setNotes}}>
-            {children}
-        </NotesListContext.Provider>
-    )
+    return <>{children}</>
 }

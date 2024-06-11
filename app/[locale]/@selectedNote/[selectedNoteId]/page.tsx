@@ -1,19 +1,20 @@
 "use client"
 
 import Note from "@/app/_models/Note";
-import React, {useContext, useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {IconButton, TextField, Tooltip, Typography} from "@mui/material";
 import {useCurrentLocale, useScopedI18n} from "@/config/locales/client";
 import {Box} from "@mui/system";
 import {Check, Delete, Edit} from "@mui/icons-material";
 import {notFound} from "next/navigation";
-import {NotesListContext} from "@/app/[locale]/@notesList/notes-context";
+import {useNotesList} from "@/app/[locale]/@notesList/notes-context";
 import LoadingSelectedNote from "@/app/[locale]/@selectedNote/[selectedNoteId]/loading-client";
 import {del, patch} from "@/app/[locale]/_util/fetching";
 import {toMap} from "@/app/_models/Error";
 import {ErrorFormHelper, Timestamp} from "@/app/[locale]/_util/components-client";
 import {Container} from "@/app/[locale]/@selectedNote/[selectedNoteId]/container";
 import Link from "next/link";
+import {create} from "zustand";
 
 function EditOrSaveButton({isEditing, setEditing}: {
     isEditing: boolean,
@@ -60,10 +61,15 @@ function NoteFormFields({note, FieldComponentType, fieldProps, errors}: {
     </Box>;
 }
 
-function DeleteButton({setSuspended}: { setSuspended: (value: boolean) => void }) {
+function DeleteButton() {
     const scopedT = useScopedI18n("commons");
-    const noteId = useContext(SelectedNoteIdContext);
-    const {notes, setNotes} = useContext(NotesListContext);
+    const {noteId, resetSelectedNoteId} = useSelectedNoteId(state => {
+        return {
+            noteId: state.selectedNoteId!,
+            resetSelectedNoteId: state.clearSelectedNoteId
+        }
+    });
+    const removeNote = useNotesList(state => state.removeById);
     const currentLocale = useCurrentLocale();
 
     return (
@@ -76,9 +82,10 @@ function DeleteButton({setSuspended}: { setSuspended: (value: boolean) => void }
                         console.error(response);
                         return;
                     }
-                    setNotes(notes!.filter(n => n.id !== noteId));
+
+                    removeNote(noteId);
                     // to prevent 404 page flashing
-                    setSuspended(true);
+                    resetSelectedNoteId();
                 }} id="delete-button">
                     <Delete/>
                 </IconButton>
@@ -98,13 +105,21 @@ const nonEditableProps = new Map<string, any>([
 
 function SelectedNote() {
     const [isEditing, setEditing] = useState(false);
-    const noteId = useContext(SelectedNoteIdContext);
-    const {notes, setNotes} =
-        useContext(NotesListContext) as { notes: Note[], setNotes: (notes: Note[]) => void };
+    const {noteId, resetCalled} = useSelectedNoteId(state => {
+        return {
+            noteId: state.selectedNoteId,
+            resetCalled: state.resetCalled
+        }
+    });
+    const {notes, update} = useNotesList(state => {
+        return {
+            notes: state.notes,
+            update: state.update
+        }
+    });
+
     const note = notes?.find(n => n.id === noteId)!;
     const [loading, setLoading] = useState(true);
-    // render is being suspended on deletion to prevent error flashing util next page is loaded
-    const [suspended, setSuspended] = useState(false);
     const scopedT = useScopedI18n("noteFields");
     const [errors, setErrors] = useState(new Map<string, string[]>());
 
@@ -123,14 +138,15 @@ function SelectedNote() {
 
     useEffect(() => {
         if (notes) {
-            if (!note && !suspended) {
+            if (!note && !resetCalled) {
                 notFound();
             }
             setLoading(false);
         }
-    }, [suspended, note, notes]);
+    }, [resetCalled, note, notes]);
 
-    if (suspended) {
+    // avoid unnecessary rendering and errors while awaiting redirect
+    if (resetCalled) {
         return <Container />;
     }
 
@@ -151,31 +167,36 @@ function SelectedNote() {
                     }
 
                     setErrors(new Map<string, string[]>());
-                    const newNote = Note.fromResponseData(await response.json());
-                    setNotes(notes.map(n => n.id === noteId ? newNote : n));
+                    update(Note.fromResponseData(await response.json()));
                     setEditing(false);
                 }}>
                     <NoteFormFields note={note} FieldComponentType={isEditing ? TextField : Typography} fieldProps={
                         isEditing ? editableProps : nonEditableProps
                     } errors={errors}/>
                     <EditOrSaveButton isEditing={isEditing} setEditing={setEditing}/>
-                    <DeleteButton setSuspended={setSuspended}/>
+                    <DeleteButton />
                 </Box> : <LoadingSelectedNote box/>
             }
         </Container>
     );
 }
 
-// there is no realistic case when this would overflow because script runs on client
-let keyCounter = Number.MIN_VALUE;
-
-const SelectedNoteIdContext = React.createContext(0);
+// for some reason type isn`t inferred automatically
+const useSelectedNoteId = create<{
+    selectedNoteId: number | null,
+    resetCalled: boolean,
+    clearSelectedNoteId: () => void,
+    setSelectedNoteId: (selectedNoteId: number) => void
+}>((set) =>({
+    selectedNoteId: null,
+    resetCalled: false,
+    clearSelectedNoteId: () => set({selectedNoteId: null, resetCalled: true}),
+    setSelectedNoteId: (selectedNoteId: number) => set({selectedNoteId, resetCalled: false})
+}));
 
 export default function NoteMaximized({params}: { params: { selectedNoteId: string } }) {
-    return (
-        <SelectedNoteIdContext.Provider value={parseInt(params.selectedNoteId)}>
-            <SelectedNote key={keyCounter++}/>
-        </SelectedNoteIdContext.Provider>
-    )
+    const setSelectedNoteId = useSelectedNoteId(state => state.setSelectedNoteId);
+    setSelectedNoteId(Number(params.selectedNoteId));
+    return <SelectedNote />
 }
 

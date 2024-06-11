@@ -4,15 +4,16 @@ import {Skeleton, Stack, TextField} from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import Note from "@/app/_models/Note";
 import NoteCard, {AddNoteCard} from "@/app/[locale]/@notesList/note-card";
-import React, {useContext, useState} from "react";
+import React, {useState} from "react";
 import {useScopedI18n} from "@/config/locales/client";
-import {NotesListContext} from "@/app/[locale]/@notesList/notes-context";
+import {useNotesList} from "@/app/[locale]/@notesList/notes-context";
 
 // eslint-disable-next-line @next/next/no-async-client-component
 export default function NotesList() {
-    const { notes, setNotes } = useContext(NotesListContext);
+    const notes  = useNotesList(state => state.notes)
     const [searchFilter, setSearchFilter]
         = useState((() => () => true) as () => (note: Note) => boolean);
+    console.log(notes)
 
     return (
         <Container>

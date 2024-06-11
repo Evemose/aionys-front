@@ -110,12 +110,18 @@ describe('Basic scenarios of authenticated user', () => {
     });
 
     it('should delete a note and persist after refresh', () => {
-        cy.contains('Note 2').click();
-        cy.get('[id="delete-button"]').click();
-        cy.contains('Note 2').should('not.exist');
-        // wait for link to forward to home page
-        cy.wait(100).reload();
-        cy.contains('Note 2').should('not.exist');
+
+        function deleteNote(titlePart: string) {
+            cy.contains(titlePart).click();
+            cy.get('[id="delete-button"]').click();
+            cy.contains(titlePart).should('not.exist');
+            // wait for link to forward to home page
+            cy.wait(100).reload();
+            cy.contains(titlePart).should('not.exist');
+        }
+
+        deleteNote('Note 1');
+        deleteNote('Note 2');
     });
 
     it('should log out', () => {
