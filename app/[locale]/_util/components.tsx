@@ -1,26 +1,17 @@
-import {Box, FormHelperText, Typography} from "@mui/material";
+import {Box, Typography} from "@mui/material";
 import React from "react";
-
-export function ErrorFormHelper({errors, field}: { errors: Map<string, string[]>, field: any }) {
-    return <>
-        {
-            errors.has(field) &&
-            <FormHelperText error id={`${field}-helper`}>
-                {errors.get(field)!.map((error, index) =>
-                    <Typography key={index} variant="caption">{error}</Typography>)}
-            </FormHelperText>
-        }
-    </>;
-}
+import {cookies} from "next/headers";
+import {getScopedI18n} from "@/config/locales/server";
 
 export async function LoggedInOnlyContainer({children}: { children: React.ReactNode }) {
-    const cookies = (await import("next/headers")).cookies();
-    if (!cookies.get("BearerTail")) {
+    const scopedT = await getScopedI18n("commons" as never);
+    if (!cookies().get("BearerTail")) {
         return (
-            <Box className="flex justify-center items-center h-full">
-                <Typography variant="h3">You must be logged in to access this page.</Typography>
+            <Box className="flex justify-center items-center h-full text-center">
+                <Typography variant="h3">{scopedT("mustBeLoggedIn" as never, {count: 0 as never})}</Typography>
             </Box>
         );
     }
     return <>{children}</>
 }
+

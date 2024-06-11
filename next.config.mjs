@@ -4,10 +4,10 @@ const nextConfig = {
     images: {
         remotePatterns: [
             {
-                hostname: 'https://cdn.worldvectorlogo.com/'
+                hostname: 'http://localhost:8080/'
             }
         ]
-    }
+    },
 };
 
 export default nextConfig;

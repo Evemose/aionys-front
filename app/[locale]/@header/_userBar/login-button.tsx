@@ -8,7 +8,8 @@ import {Backdrop, Button, TextField, Typography} from "@mui/material";
 import {Box} from "@mui/system";
 import {useRouter} from "next/navigation";
 
-import {ErrorFormHelper} from "@/app/[locale]/_util/components";
+import {ErrorFormHelper} from "@/app/[locale]/_util/components-client";
+import {AppRouterInstance} from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 const enum BackdropType {
     Login = "login",
@@ -18,19 +19,17 @@ const enum BackdropType {
 
 const login = async (
     form: HTMLFormElement,
-    router: any,
+    router: AppRouterInstance,
     setCurrentBackdrop: (value: BackdropType) => void,
     handleErrors: (response: Response) => Promise<void>
 ) => {
     const formData = new FormData(form);
     const response = await post("/login", {},
         `Basic ${btoa(`${formData.get("username")}:${formData.get("password")}`)}`);
-
     if (!response.ok) {
         await handleErrors(response);
         return;
     }
-
     setCurrentBackdrop(BackdropType.None);
     router.refresh();
 };
@@ -64,11 +63,13 @@ export function LoginButton() {
     const scopedT = useScopedI18n("loginRegister");
     return (
         <>
-            <Button onClick={() => setCurrentBackdrop(BackdropType.Login)} variant="contained">
+            <Button id="login" onClick={() => setCurrentBackdrop(BackdropType.Login)} variant="contained">
                 {scopedT("login")}
             </Button>
-            <Backdrop open={currentBackdrop !== BackdropType.None}
-                      onClick={() => setCurrentBackdrop(BackdropType.None)}>
+            <Backdrop
+                id="login-register-backdrop"
+                open={currentBackdrop !== BackdropType.None}
+                onClick={() => setCurrentBackdrop(BackdropType.None)}>
                 {
                     currentBackdrop === BackdropType.Login && <LoginForm setCurrentBackdrop={setCurrentBackdrop}/>
                 }

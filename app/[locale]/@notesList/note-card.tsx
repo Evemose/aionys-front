@@ -3,11 +3,12 @@
 import Note from "@/app/_models/Note";
 import {Paper, Tooltip, Typography} from "@mui/material";
 import {Button} from "@mui/base";
-import {Timestamp} from "@/app/[locale]/_util/components-client";
 import React from "react";
 import {Add} from "@mui/icons-material";
 import {useScopedI18n} from "@/config/locales/client";
 import {useRouter} from "next/navigation";
+
+import {Timestamp} from "@/app/[locale]/_util/components-client";
 
 
 export default function NoteCard(props: { note: Note }) {
@@ -26,7 +27,8 @@ export default function NoteCard(props: { note: Note }) {
                         note.content.length > 30 ? note.content.substring(0, 30) + "..." : note.content
                     }
                 </Typography>
-                <Timestamp createdAt={note.createdAt} lastModifiedAt={note.lastModifiedAt}/>
+                <Timestamp createdAt={note.createdAt} lastModifiedAt={note.lastModifiedAt}
+                           id={"list" + note.id.toString()}/>
             </Container>
         </Button>
     )
@@ -37,7 +39,7 @@ export function AddNoteCard() {
     const router = useRouter();
     return (
         <Tooltip title={scopedT("addNote")}>
-            <Button className="text-start" onClick={(e) => {
+            <Button id="add-note-card" className="text-start" onClick={(e) => {
                 e.preventDefault();
                 router.push("/");
             }}>

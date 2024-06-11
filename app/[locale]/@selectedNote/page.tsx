@@ -5,11 +5,12 @@ import React, {useContext, useRef, useState} from "react";
 import Note from "@/app/_models/Note";
 import {Box} from "@mui/system";
 import {Button, TextField, Tooltip} from "@mui/material";
-import {Container} from "@/app/[locale]/@selectedNote/[selectedNoteId]/page";
 import {NotesListContext} from "@/app/[locale]/@notesList/notes-context";
 import {post} from "@/app/[locale]/_util/fetching";
 import ErrorResponse, {toMap} from "@/app/_models/Error";
-import {ErrorFormHelper} from "@/app/[locale]/_util/components";
+
+import {ErrorFormHelper} from "@/app/[locale]/_util/components-client";
+import {Container} from "@/app/[locale]/@selectedNote/[selectedNoteId]/container";
 
 async function handlePostError(
     response: Response,
@@ -47,7 +48,7 @@ export default function AddNote() {
                          await handlePostError(response, setErrors);
                          return;
                      }
-                     setNotes([...notes, Note.fromResponseData(await response.json())]);
+                     setNotes([...(notes ?? []), Note.fromResponseData(await response.json())]);
                      currentTarget.reset();
                  }}>
                 <TextField label={scopedTNotes("title")} variant="outlined"

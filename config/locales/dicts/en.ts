@@ -3,7 +3,8 @@ const en = {
         editedAt: 'edited',
         edit: 'Edit',
         save: 'Save',
-        delete: 'Delete'
+        delete: 'Delete',
+        mustBeLoggedIn: 'You must be logged in to access this page.',
     },
     notesList: {
         search: 'Search notes',
@@ -18,6 +19,7 @@ const en = {
         registerTitle: 'Registration',
         dontHaveAnAccount: 'Don\'t have an account? Register',
         alreadyHaveAnAccount: 'Already have an account? Login',
+        logout: 'Logout',
     },
     selectedNoteError: {
         noteNotFound: 'Note not found',

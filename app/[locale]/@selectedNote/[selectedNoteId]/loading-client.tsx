@@ -2,7 +2,8 @@ import {IconButton, Skeleton, Typography} from "@mui/material";
 import {Box} from "@mui/system";
 import React from "react";
 import {Check, Delete} from "@mui/icons-material";
-import {Container} from "@/app/[locale]/@selectedNote/[selectedNoteId]/page";
+
+import {Container} from "@/app/[locale]/@selectedNote/[selectedNoteId]/container";
 
 
 function Skeletons() {

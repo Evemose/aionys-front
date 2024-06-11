@@ -15,7 +15,7 @@ export default function LanguageSelector() {
             <InputLabel id="language-label">{scopedT("language")}</InputLabel>
             <Select
                 labelId="language-label"
-                id="language"
+                id="language-select"
                 value={currentLocale}
                 label={scopedT("language")}
                 onChange={

@@ -1,8 +1,8 @@
 "use client"
 
-import {Container} from "@/app/[locale]/@selectedNote/[selectedNoteId]/page";
 import {useScopedI18n} from "@/config/locales/client";
 import {Typography} from "@mui/material";
+import {Container} from "@/app/[locale]/@selectedNote/[selectedNoteId]/container";
 
 export default function ErrorSelectedNote() {
     const scopedT = useScopedI18n("selectedNoteError")

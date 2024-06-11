@@ -1,16 +1,19 @@
 "use client"
 
 import Note from "@/app/_models/Note";
-import React, {useContext, useEffect,  useState} from "react";
-import {IconButton, Paper, TextField, Tooltip, Typography} from "@mui/material";
-import {Timestamp} from "@/app/[locale]/_util/components-client";
+import React, {useContext, useEffect, useState} from "react";
+import {IconButton, TextField, Tooltip, Typography} from "@mui/material";
 import {useCurrentLocale, useScopedI18n} from "@/config/locales/client";
 import {Box} from "@mui/system";
 import {Check, Delete, Edit} from "@mui/icons-material";
-import {useRouter} from "next/navigation";
+import {notFound} from "next/navigation";
 import {NotesListContext} from "@/app/[locale]/@notesList/notes-context";
 import LoadingSelectedNote from "@/app/[locale]/@selectedNote/[selectedNoteId]/loading-client";
 import {del, patch} from "@/app/[locale]/_util/fetching";
+import {toMap} from "@/app/_models/Error";
+import {ErrorFormHelper, Timestamp} from "@/app/[locale]/_util/components-client";
+import {Container} from "@/app/[locale]/@selectedNote/[selectedNoteId]/container";
+import Link from "next/link";
 
 function EditOrSaveButton({isEditing, setEditing}: {
     isEditing: boolean,
@@ -19,58 +22,67 @@ function EditOrSaveButton({isEditing, setEditing}: {
     const scopedT = useScopedI18n("commons");
     return !isEditing ?
         <Tooltip title={scopedT("edit")}>
-            <IconButton className="self-start" onClick={() => setEditing(true)}>
+            <IconButton className="self-start" onClick={(e) => {
+                e.preventDefault();
+                setEditing(true);
+            }} id="edit-button">
                 <Edit/>
             </IconButton>
         </Tooltip> :
         <Tooltip title={scopedT("save")}>
-            <IconButton className="self-start" type="submit" onClick={(e) => {
-                setEditing(false);
-                e.currentTarget.form!.requestSubmit();
-            }}>
+            <IconButton className="self-start" type="submit"
+                        id="save-button">
                 <Check/>
             </IconButton>
         </Tooltip>;
 }
 
 
-function NoteFormFields({note, FieldComponentType, fieldProps}: {
+function NoteFormFields({note, FieldComponentType, fieldProps, errors}: {
     FieldComponentType: React.ComponentType<any>,
     fieldProps: Map<string, any>,
     note: Note,
+    errors: Map<string, string[]>
 }) {
     return <Box className="w-full flex flex-col gap-4">
-        <FieldComponentType type="text" name="title" defaultValue={note.title} {...fieldProps.get("title")}>
+        <ErrorFormHelper errors={errors} field="title"/>
+        <FieldComponentType type="text" name="title" defaultValue={note.title} {...fieldProps.get("title")}
+                            aria-label="title-helper">
             {note.title}
         </FieldComponentType>
-        <FieldComponentType type="text" name="content" defaultValue={note.content} {...fieldProps.get("content")}>
+        <ErrorFormHelper errors={errors} field="content"/>
+        <FieldComponentType type="text" name="content" aria-label="content-helper"
+                            defaultValue={note.content} {...fieldProps.get("content")}>
             {note.content}
         </FieldComponentType>
-        <Timestamp createdAt={note.createdAt} lastModifiedAt={note.lastModifiedAt}/>
+        <Timestamp createdAt={note.createdAt} lastModifiedAt={note.lastModifiedAt}
+                   id={"selected-note"}/>
     </Box>;
 }
 
-export function DeleteButton() {
+function DeleteButton({setSuspended}: { setSuspended: (value: boolean) => void }) {
     const scopedT = useScopedI18n("commons");
     const noteId = useContext(SelectedNoteIdContext);
     const {notes, setNotes} = useContext(NotesListContext);
-    const router = useRouter();
     const currentLocale = useCurrentLocale();
+
     return (
         <Tooltip title={scopedT("delete")}>
-            <IconButton onClick={(e) => {
-                e.preventDefault();
-                del(`/notes/${noteId}`).then(response => {
+            <Link href={`/${currentLocale}`} className="self-start">
+                <IconButton onClick={async () => {
+                    const response = await del(`/notes/${noteId}`);
+
                     if (!response.ok) {
                         console.error(response);
                         return;
                     }
-                    setNotes(notes.filter(n => n.id !== noteId));
-                });
-                router.push(`/${currentLocale}`);
-            }} className="self-start">
-                <Delete/>
-            </IconButton>
+                    setNotes(notes!.filter(n => n.id !== noteId));
+                    // to prevent 404 page flashing
+                    setSuspended(true);
+                }} id="delete-button">
+                    <Delete/>
+                </IconButton>
+            </Link>
         </Tooltip>
     );
 }
@@ -85,13 +97,16 @@ const nonEditableProps = new Map<string, any>([
 ]);
 
 function SelectedNote() {
-    const [isEditing, setIsEditing] = useState(false);
+    const [isEditing, setEditing] = useState(false);
     const noteId = useContext(SelectedNoteIdContext);
-    const [loading, setLoading] = useState(true);
     const {notes, setNotes} =
         useContext(NotesListContext) as { notes: Note[], setNotes: (notes: Note[]) => void };
     const note = notes?.find(n => n.id === noteId)!;
+    const [loading, setLoading] = useState(true);
+    // render is being suspended on deletion to prevent error flashing util next page is loaded
+    const [suspended, setSuspended] = useState(false);
     const scopedT = useScopedI18n("noteFields");
+    const [errors, setErrors] = useState(new Map<string, string[]>());
 
     const editableProps = new Map<string, any>([
         ["title", {
@@ -108,9 +123,16 @@ function SelectedNote() {
 
     useEffect(() => {
         if (notes) {
+            if (!note && !suspended) {
+                notFound();
+            }
             setLoading(false);
         }
-    }, [noteId, notes]);
+    }, [suspended, note, notes]);
+
+    if (suspended) {
+        return <Container />;
+    }
 
     return (
         <Container>
@@ -122,18 +144,22 @@ function SelectedNote() {
                         title: formData.get("title") as string,
                         content: formData.get("content") as string
                     });
+
                     if (!response.ok) {
-                        console.error(await response.json());
+                        setErrors(toMap(await response.json()));
                         return;
                     }
+
+                    setErrors(new Map<string, string[]>());
                     const newNote = Note.fromResponseData(await response.json());
                     setNotes(notes.map(n => n.id === noteId ? newNote : n));
+                    setEditing(false);
                 }}>
                     <NoteFormFields note={note} FieldComponentType={isEditing ? TextField : Typography} fieldProps={
                         isEditing ? editableProps : nonEditableProps
-                    }/>
-                    <EditOrSaveButton isEditing={isEditing} setEditing={setIsEditing}/>
-                    <DeleteButton/>
+                    } errors={errors}/>
+                    <EditOrSaveButton isEditing={isEditing} setEditing={setEditing}/>
+                    <DeleteButton setSuspended={setSuspended}/>
                 </Box> : <LoadingSelectedNote box/>
             }
         </Container>
@@ -153,10 +179,3 @@ export default function NoteMaximized({params}: { params: { selectedNoteId: stri
     )
 }
 
-export function Container({children, styles}: { children: React.ReactNode, styles?: string }) {
-    return (
-        <Paper className={styles + " w-3/4 p-4 m-10"} elevation={3}>
-            {children}
-        </Paper>
-    )
-}

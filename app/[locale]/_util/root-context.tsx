@@ -3,6 +3,7 @@ import {I18nProviderClient} from "@/config/locales/client";
 import {ThemeProvider} from "@mui/material";
 import {getCurrentLocale} from "@/config/locales/server";
 import theme from "@/config/theme";
+import {SWRConfig} from "swr";
 
 export default function RootContext({children}: { children: React.ReactNode }) {
     const currentLocale = getCurrentLocale();
