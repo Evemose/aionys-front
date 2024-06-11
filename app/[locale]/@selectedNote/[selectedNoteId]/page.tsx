@@ -83,9 +83,8 @@ function DeleteButton() {
                         return;
                     }
 
-                    removeNote(noteId);
-                    // to prevent 404 page flashing
                     resetSelectedNoteId();
+                    removeNote(noteId);
                 }} id="delete-button">
                     <Delete/>
                 </IconButton>
@@ -153,7 +152,9 @@ function SelectedNote() {
     return (
         <Container>
             {
-                !loading ? <Box component="form" className="flex" onSubmit={async (e) => {
+                // very rarely note is already deleted, but guard clause is not triggered,
+                // so better to check note existence here also
+                !loading && note ? <Box component="form" className="flex" onSubmit={async (e) => {
                     e.preventDefault();
                     const formData = new FormData(e.currentTarget);
                     const response = await patch(`/notes/${noteId}`, {
