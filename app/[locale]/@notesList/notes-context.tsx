@@ -46,16 +46,26 @@ export const useNotesList = create<NotesState>((set) => ({
 
 export default function NotesListProvider({children}: { children: React.ReactNode }) {
     const {data: notes} = useGet("/notes");
-    const {pushAll, clear} = useNotesList(state => {
+    return <NotesListProviderInner notes={notes} children={children}/>
+}
+
+// use inner to not perform fetch on every state change
+function NotesListProviderInner({children, notes}: { children: React.ReactNode, notes: Note[] }) {
+    const {stateNotes, pushAll, clear} = useNotesList(state => {
         return {
+            stateNotes: state.notes,
             clear: state.clear,
             pushAll: state.pushAll
         }
     });
 
     useEffect(() => {
+        console.log("notes", notes);
         if (notes) {
-            pushAll(notes);
+            pushAll(notes
+                .map(Note.fromResponseData)
+                // remove duplicates
+                .filter((note: Note) => !stateNotes || !stateNotes.some((n) => n.id === note.id)));
         } else {
             // only happens when page is refreshed
             clear();

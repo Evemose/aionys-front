@@ -1,7 +1,6 @@
 import engDictionary from '@/config/locales/dicts/en';
 import ukDictionary from '@/config/locales/dicts/uk';
 
-// TODO: delete created user after test
 describe('Basic scenarios of authenticated user', () => {
     const username = `test`;
     const password = 'pass123G$%!';

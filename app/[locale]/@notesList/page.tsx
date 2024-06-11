@@ -13,7 +13,6 @@ export default function NotesList() {
     const notes  = useNotesList(state => state.notes)
     const [searchFilter, setSearchFilter]
         = useState((() => () => true) as () => (note: Note) => boolean);
-    console.log(notes)
 
     return (
         <Container>

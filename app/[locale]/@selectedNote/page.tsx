@@ -31,7 +31,7 @@ async function handlePostError(
 export default function AddNote() {
     const scopedTCommons = useScopedI18n("commons");
     const scopedTNotes = useScopedI18n("noteFields");
-    const add = useNotesList(state => state.push);
+    const addNote = useNotesList(state => state.push);
     const [errors, setErrors] = useState<Map<string, string[]>>(new Map());
     return (
         <Container>
@@ -48,7 +48,7 @@ export default function AddNote() {
                          await handlePostError(response, setErrors);
                          return;
                      }
-                     add(Note.fromResponseData(await response.json()));
+                     addNote(Note.fromResponseData(await response.json()));
                      currentTarget.reset();
                  }}>
                 <TextField label={scopedTNotes("title")} variant="outlined"

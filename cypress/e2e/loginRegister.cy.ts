@@ -1,5 +1,6 @@
 import engDictionary from "@/config/locales/dicts/en";
 
+// TODO: delete created user after test
 describe('Login and register', () => {
     const newUsername = `user${Math.floor(Math.random() * 10000)}`
     const password = 'pass123G$%!';
