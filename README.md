@@ -57,23 +57,6 @@ Copy code
 docker-compose down -v
 ```
 
-## Using .env
-To use an .env file for environment variables, add the env_file section in the docker-compose.yml:
-
-```yaml
-services:
-    main:
-        image: "front-dev"
-        build:
-            context: .
-            dockerfile: Dockerfile.dev
-        container_name: "front-dev"
-        ports:
-            - "3000:3000"
-        env_file:
-            - .env
-```
-
 ## Troubleshooting
 If you encounter issues, please ensure:
 
