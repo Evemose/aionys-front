@@ -1,0 +1,9 @@
+services:
+    main:
+        image: "aionys-front-dev"
+        build:
+            context: .
+            dockerfile: Dockerfile.dev
+        container_name: "notes-front-dev"
+        ports:
+            - "3000:3000"
