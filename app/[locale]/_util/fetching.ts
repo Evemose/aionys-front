@@ -1,4 +1,6 @@
-const BACKEND_URL = 'http://localhost:8080';
+import * as process from "node:process";
+
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 function getDefaultHeaders() {
     const headers = {
@@ -27,6 +29,7 @@ export const post = async (url: string, body?: any, auth?: string) => {
 }
 
 export const get = async (url: string) => {
+    console.log('fetching', BACKEND_URL + url);
     return fetch(BACKEND_URL + url, {
         method: 'GET',
         credentials: 'include',

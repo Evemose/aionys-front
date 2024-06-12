@@ -4,6 +4,9 @@ services:
         build:
             context: .
             dockerfile: Dockerfile.dev
+            network: host # Next.js server needs access to the host network during build for server side requests
         container_name: "notes-front-dev"
         ports:
             - "3000:3000"
+        environment:
+            - NEXT_PUBLIC_BACKEND_URL=http://host.docker.internal:8080

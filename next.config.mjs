@@ -8,6 +8,12 @@ const nextConfig = {
             }
         ]
     },
+    logging: {
+        level: 'trace',
+        fetches: {
+            fullUrl: true,
+        }
+    }
 };
 
 export default nextConfig;
