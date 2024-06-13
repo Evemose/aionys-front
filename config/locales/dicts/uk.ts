@@ -50,7 +50,14 @@ const uk = {
         "Invalid password": "Невірний пароль",
         "already taken": "вже зайнято",
         "Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one digit and one special character": "Пароль повинен містити принаймні 8 символів, одну велику англійську літеру, одну маленьку англійську літеру, одну цифру та один спеціальний символ",
-    }
+    },
+    uploadImage: {
+        changeProfilePicture: 'Змінити аватар',
+        uploadFile: 'Завантажити файл',
+        dropImageHereOrClickToUploadFromFileSystem: 'Перетягніть сюди зображення або натисніть, щоб завантажити з файлової системи',
+        submit: 'Підтвердити',
+        onlyOneFileAllowed: 'Дозволено лише один файл',
+    },
 }
 
 export default uk;

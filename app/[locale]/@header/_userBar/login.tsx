@@ -31,6 +31,7 @@ const login = async (
     const formData = new FormData(form);
     const response = await post("/login", {},
         `Basic ${btoa(`${formData.get("username")}:${formData.get("password")}`)}`);
+    console.log(response);
     if (!response.ok) {
         await handleErrors(response);
         return;

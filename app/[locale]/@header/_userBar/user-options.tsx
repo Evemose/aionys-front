@@ -30,6 +30,7 @@ function LogoutButton() {
                 if (process.env.NEXT_PUBLIC_ACTIVE_PROFILE === "dev") {
                     localStorage.removeItem("token");
                 }
+                router.push("/");
                 router.refresh();
             });
         }}>{scopedT("logout")}</Typography>

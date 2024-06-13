@@ -29,8 +29,9 @@ export default function UserBar() {
         setLoggedIn(localStorage.getItem("token") !== null);
     }, [setLoggedIn]);
 
+
     if (loggedIn) {
-        return <LoggedInBar/>
+        return <LoggedInBar />
     }
 
     // wait useEffect to set login state

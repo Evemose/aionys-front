@@ -4,7 +4,7 @@ const nextConfig = {
     images: {
         remotePatterns: [
             {
-                hostname: 'http://localhost:8080/'
+                hostname: 'host.docker.internal'
             }
         ]
     },
