@@ -20,11 +20,14 @@ describe('Login and register', () => {
         cy.contains('button', engDictionary.loginRegister.dontHaveAnAccount).click();
         cy.get('input[name="username"]').type(newUsername);
         cy.get('input[name="password"]').type("12g");
+        cy.get('input[name="passwordConfirmation"]').type("12g");
         cy.get('button[type="submit"]').click();
         cy.contains(engDictionary
             .errors["Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one digit and one special character"]).should('be.visible');
         cy.get('input[name="password"]').clear();
         cy.get('input[name="password"]').type(password);
+        cy.get('input[name="passwordConfirmation"]').clear();
+        cy.get('input[name="passwordConfirmation"]').type(password);
         cy.get('button[type="submit"]').click();
         cy.get("[id='login-register-backdrop']").should('not.exist');
         cy.contains(engDictionary.commons.mustBeLoggedIn).should('not.exist');
