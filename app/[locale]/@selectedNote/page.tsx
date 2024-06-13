@@ -55,7 +55,7 @@ export default function AddNote() {
                            aria-label={"title-helper"}
                            name="title"
                 />
-                <ErrorFormHelper errors={errors} field={"title"}/>
+                <ErrorFormHelper errors={errors} field={"title"} fieldNameSource={scopedTNotes as (field: string) => string}/>
                 <TextField label={scopedTNotes("content")} variant="outlined" multiline
                            sx={{display: 'flex', flexGrow: 1}}
                            aria-label={"content-helper"}
@@ -68,7 +68,7 @@ export default function AddNote() {
                            }}
                            name="content"
                 />
-                <ErrorFormHelper errors={errors} field={"content"}/>
+                <ErrorFormHelper errors={errors} field={"content"} fieldNameSource={scopedTNotes as (field: string) => string}/>
                 <Tooltip title={scopedTCommons("save")}>
                     <Button type="submit" color="primary" variant="contained" className="w-1/6 self-center">
                         {scopedTCommons("save")}

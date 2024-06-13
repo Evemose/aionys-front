@@ -45,13 +45,14 @@ function NoteFormFields({note, FieldComponentType, fieldProps, errors}: {
     note: Note,
     errors: Map<string, string[]>
 }) {
+    const scopedT = useScopedI18n("noteFields");
     return <Box className="w-full flex flex-col gap-4">
-        <ErrorFormHelper errors={errors} field="title"/>
+        <ErrorFormHelper errors={errors} field="title" fieldNameSource={scopedT as (field: string) => string}/>
         <FieldComponentType type="text" name="title" defaultValue={note.title} {...fieldProps.get("title")}
                             aria-label="title-helper">
             {note.title}
         </FieldComponentType>
-        <ErrorFormHelper errors={errors} field="content"/>
+        <ErrorFormHelper errors={errors} field="content" fieldNameSource={scopedT as (field: string) => string}/>
         <FieldComponentType type="text" name="content" aria-label="content-helper"
                             defaultValue={note.content} {...fieldProps.get("content")}>
             {note.content}

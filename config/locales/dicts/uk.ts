@@ -36,6 +36,13 @@ const uk = {
         username: 'Ім\'я користувача',
         password: 'Пароль',
         passwordConfirmation: 'Підтвердіть пароль',
+    },
+    errors: {
+        "Must not be blank": "Поле має бути не порожнім",
+        "Passwords do not match": "Паролі не співпадають",
+        "Invalid password": "Невірний пароль",
+        "already exists": "вже зайнято",
+        "Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one digit and one special character": "Пароль повинен містити принаймні 8 символів, одну велику англійську літеру, одну маленьку англійську літеру, одну цифру та один спеціальний символ",
     }
 }
 

@@ -6,13 +6,25 @@ import {toNormalDateFormat} from "@/app/[locale]/_util/misc";
 import {useScopedI18n} from "@/config/locales/client";
 import {useLoggedIn} from "@/app/[locale]/@header/_userBar/user-bar";
 
-export function ErrorFormHelper({errors, field}: { errors: Map<string, string[]>, field: any }) {
+export function ErrorFormHelper({errors, field, fieldNameSource}: {
+    errors: Map<string, string[]>,
+    field: any,
+    fieldNameSource : (field: string) => string
+}) {
+    const scopedT = useScopedI18n("errors");
     return <>
         {
             errors.has(field) &&
             <FormHelperText error id={`${field}-helper`}>
-                {errors.get(field)!.map((error, index) =>
-                    <Typography key={index} variant="caption">{error}</Typography>)}
+                {errors.get(field)!.map((error, index) => {
+                    let message;
+                    if (error.endsWith("already exists")) {
+                        message = fieldNameSource(field) + " " + scopedT("already taken");
+                    } else {
+                        message = scopedT(error as never);
+                    }
+                    return <Typography key={index} variant="caption">{message}</Typography>
+                })}
             </FormHelperText>
         }
     </>;

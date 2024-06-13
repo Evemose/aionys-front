@@ -147,12 +147,15 @@ function RegisterForm(
     const scopedTLoginRegister = useScopedI18n("loginRegister");
     return (
         <Box onClick={(e) => e.stopPropagation()}
-             className="bg-white w-[30dvw] h-[50dvh] rounded-xl flex justify-center items-center flex-col gap-2">
+             className={`bg-white 
+             ${errors.size > 0 ? "w-[40dvw]" : "w-[30dvw]"} 
+             ${errors.size > 0 ? "h-[60dvh]" : "h-[50dvh]"} rounded-xl flex justify-center items-center flex-col gap-2`}>
             <Typography variant="h5">{scopedTLoginRegister("registerTitle")}</Typography>
             <Box component="form" onSubmit={handleSubmit}
-                 className="flex flex-col gap-2">
+                 className="flex flex-col gap-2 w-4/5">
                 <SharedFields errors={errors}/>
-                <ErrorFormHelper errors={errors} field={"passwordConfirmation"}/>
+                <ErrorFormHelper errors={errors} field={"passwordConfirmation"}
+                                 fieldNameSource={useScopedI18n("userFormFields") as (field: string) => string}/>
                 <PasswordInput label="passwordConfirmation"/>
                 <Button variant="contained" type="submit">{scopedTLoginRegister("register")}</Button>
             </Box>
@@ -186,9 +189,11 @@ function PasswordInput({label} : {label: string}) {
 function SharedFields({errors}: { errors: Map<string, string[]> }) {
     const scopedT = useScopedI18n("userFormFields");
     return <>
-        <ErrorFormHelper errors={errors} field="username"/>
+        <ErrorFormHelper errors={errors} field="username"
+                         fieldNameSource={scopedT as (field: string) => string} />
         <TextField name="username" label={scopedT("username")} aria-describedby="username-helper"/>
-        <ErrorFormHelper errors={errors} field="password"/>
+        <ErrorFormHelper errors={errors} field="password"
+                         fieldNameSource={scopedT as (field: string) => string} />
         <PasswordInput label="password"/>
     </>;
 }
