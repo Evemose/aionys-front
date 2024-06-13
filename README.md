@@ -35,7 +35,7 @@ Ensure the .env file contains the necessary environment variables. Modify values
 
 ## Important Note
 
-When running in Docker (or anywhere not on localhost), set NEXT_PUBLIC_ACTIVE_PROFILE to dev in your .env file due to specifics of cross-origin cookie sharing requiring HTTPS communication for SameSite=None cookies used for authentication.
+When running in Docker (or in eny environment where frontend and backend apps are running on different hosts), set NEXT_PUBLIC_ACTIVE_PROFILE to dev in your .env file due to specifics of cross-origin cookie sharing requiring HTTPS communication for SameSite=None cookies used for authentication.
 
 # 3. Build and Run
 
