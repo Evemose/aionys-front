@@ -21,9 +21,8 @@ describe('Login and register', () => {
         cy.get('input[name="username"]').type(newUsername);
         cy.get('input[name="password"]').type("12g");
         cy.get('button[type="submit"]').click();
-        cy.contains(
-            "Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one digit and one special character"
-        ).should('be.visible');
+        cy.contains(engDictionary
+            .errors["Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one digit and one special character"]).should('be.visible');
         cy.get('input[name="password"]').clear();
         cy.get('input[name="password"]').type(password);
         cy.get('button[type="submit"]').click();
