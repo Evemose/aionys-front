@@ -24,9 +24,23 @@ Clone the parent repository along with its submodules:
 git clone --recurse-submodules <repository-url>
 cd project-root/front
 ```
+2. Create the .env File
+3. 
+Copy the .env-template file to create the required .env file:
 
-### 2. Build and Run
-Development Environment
+```sh
+cp .env-template .env
+```
+
+Ensure the .env file contains the necessary environment variables. Modify values as needed for your setup.
+
+## Important Note
+
+When running in Docker (or anywhere not on localhost), set NEXT_PUBLIC_ACTIVE_PROFILE to dev in your .env file due to specifics of cross-origin cookie sharing requiring HTTPS communication for SameSite=None cookies used for authentication.
+
+# 3. Build and Run
+
+## Development Environment
 Navigate to the front directory and build the Docker image for development:
 
 ```sh
@@ -53,7 +67,6 @@ docker-compose down
 To remove all containers, networks, and volumes created by Docker Compose, use:
 
 ```sh
-Copy code
 docker-compose down -v
 ```
 
