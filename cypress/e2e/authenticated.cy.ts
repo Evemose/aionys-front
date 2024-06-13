@@ -2,8 +2,17 @@ import engDictionary from '@/config/locales/dicts/en';
 import ukDictionary from '@/config/locales/dicts/uk';
 
 describe('Basic scenarios of authenticated user', () => {
-    const username = `test`;
+    const username = "test";
     const password = 'pass123G$%!';
+
+    before(() => {
+        cy.visit('/');
+        cy.get("button").contains(engDictionary.loginRegister.login).trigger('mouseover').click();
+        cy.get("button").contains(engDictionary.loginRegister.dontHaveAnAccount).click();
+        cy.get('input[name="username"]').type(username);
+        cy.get('input[name="password"]').type(password);
+        cy.get("button").contains(engDictionary.loginRegister.register).click();
+    })
 
     function login(lUsername?: string) {
         cy.get("button").contains(engDictionary.loginRegister.login).trigger('mouseover').click();
