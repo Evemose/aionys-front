@@ -49,7 +49,15 @@ export function Timestamp({createdAt, lastModifiedAt, id}: {
 // can be converted to server component if https is used (so cookies can be used)
 export function LoggedInOnlyContainer({children}: { children: React.ReactNode }) {
     const scopedT = useScopedI18n("commons");
-    const loggedIn = useLoggedIn(state => state.loggedIn);
+    const { loggedIn, loginSet} = useLoggedIn(state => {
+        return {
+            loggedIn: state.loggedIn,
+            loginSet: state.loginSet
+        }
+    });
+    if (!loginSet) {
+        return <></>;
+    }
     if (!loggedIn) {
         return (
             <Box className="flex justify-center items-center h-full text-center">
