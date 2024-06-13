@@ -1,7 +1,7 @@
 "use client"
 
 import LoggedInBar from "@/app/[locale]/@header/_userBar/logged-in";
-import {LoginButton} from "@/app/[locale]/@header/_userBar/login-button";
+import {Login} from "@/app/[locale]/@header/_userBar/login";
 import {create} from "zustand";
 import {useEffect} from "react";
 
@@ -38,7 +38,7 @@ export default function UserBar() {
         return <div></div>;
     }
 
-    return <LoginButton/>
+    return <Login/>
 }
 
 

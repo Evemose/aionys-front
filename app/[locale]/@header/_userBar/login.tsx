@@ -4,13 +4,14 @@ import React, {useState} from "react";
 import {useScopedI18n} from "@/config/locales/client";
 import {post} from "@/app/[locale]/_util/fetching";
 import ErrorResponse, {toMap} from "@/app/_models/Error";
-import {Backdrop, Button, TextField, Typography} from "@mui/material";
+import {Backdrop, Button, IconButton, TextField, Typography} from "@mui/material";
 import {Box} from "@mui/system";
 import {useRouter} from "next/navigation";
 
 import {ErrorFormHelper} from "@/app/[locale]/_util/components-client";
 import {AppRouterInstance} from "next/dist/shared/lib/app-router-context.shared-runtime";
 import {useLoggedIn} from "@/app/[locale]/@header/_userBar/user-bar";
+import {Visibility, VisibilityOff} from "@mui/icons-material";
 
 const enum BackdropType {
     Login = "login",
@@ -70,7 +71,7 @@ function useLoginHandler(
     }
 }
 
-export function LoginButton() {
+export function Login() {
     const [currentBackdrop, setCurrentBackdrop]
         = useState<BackdropType>(BackdropType.None);
     const scopedT = useScopedI18n("loginRegister");
@@ -161,6 +162,34 @@ function RegisterForm(
     )
 }
 
+function PasswordInput() {
+    const [showPassword, setShowPassword] = useState(false);
+    const scopedT = useScopedI18n("userFields");
+
+    return <TextField name="password"
+                      label={scopedT("password")}
+                      aria-describedby="password-helper"
+                      InputProps={{
+                          endAdornment: (
+                              <IconButton onClick={() => setShowPassword(!showPassword)}>
+                                  {showPassword ? <VisibilityOff/> : <Visibility/>}
+                              </IconButton>
+                          ),
+                          type: showPassword ? "text" : "password",
+                      }}
+    />;
+}
+
+function SharedFields({errors}: { errors: Map<string, string[]> }) {
+    const scopedT = useScopedI18n("userFields");
+    return <>
+        <ErrorFormHelper errors={errors} field="username"/>
+        <TextField name="username" label={scopedT("username")} aria-describedby="username-helper"/>
+        <ErrorFormHelper errors={errors} field="password"/>
+        <PasswordInput/>
+    </>;
+}
+
 function LoginForm(
     {
         setCurrentBackdrop
@@ -172,17 +201,13 @@ function LoginForm(
         = useState<Map<string, string[]>>(new Map());
     const handleSubmit = useLoginHandler(setErrors, setCurrentBackdrop);
     const scopedTLoginRegister = useScopedI18n("loginRegister");
-    const scopedTUser = useScopedI18n("userFields");
     return (
         <Box onClick={(e) => e.stopPropagation()}
              className="bg-white w-[30dvw] h-[50dvh] rounded-xl flex justify-center items-center flex-col gap-2">
             <Typography variant="h5">{scopedTLoginRegister("login")}</Typography>
             <Box component="form" onSubmit={handleSubmit}
                  className="flex flex-col gap-2">
-                <ErrorFormHelper errors={errors} field="username"/>
-                <TextField name="username" label={scopedTUser("username")} aria-describedby="username-helper"/>
-                <ErrorFormHelper errors={errors} field="password"/>
-                <TextField name="password" label={scopedTUser("password")} aria-describedby="password-helper"/>
+                <SharedFields errors={errors}/>
                 <Button variant="contained" type="submit">{scopedTLoginRegister("login")}</Button>
             </Box>
             <Button variant="text" style={{
