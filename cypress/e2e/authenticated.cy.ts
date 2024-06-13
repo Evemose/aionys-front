@@ -11,6 +11,7 @@ describe('Basic scenarios of authenticated user', () => {
         cy.get("button").contains(engDictionary.loginRegister.dontHaveAnAccount).click();
         cy.get('input[name="username"]').type(username);
         cy.get('input[name="password"]').type(password);
+        cy.get('input[name="passwordConfirmation"]').type(password);
         cy.get("button").contains(engDictionary.loginRegister.register).click();
     })
 
@@ -106,7 +107,7 @@ describe('Basic scenarios of authenticated user', () => {
         cy.get("[id='edit-button']").click();
         cy.get('input[name="title"]').clear();
         cy.get("[id='save-button']").click();
-        cy.contains('Must not be blank').should('be.visible');
+        cy.contains(engDictionary.errors["Must not be blank"]).should('be.visible');
         cy.get('input[name="title"]').type('Updated Note 1 v2');
         cy.get("[id='save-button']").click();
         cy.get('h1').contains('Updated Note 1 v2').should('be.visible');
@@ -135,6 +136,6 @@ describe('Basic scenarios of authenticated user', () => {
     it('should log out', () => {
         cy.contains(username).click();
         cy.contains(engDictionary.loginRegister.logout).click();
-        cy.contains('You must be logged in to access this page.').should('be.visible');
+        cy.contains(engDictionary.commons.mustBeLoggedIn).should('be.visible');
     });
 });
