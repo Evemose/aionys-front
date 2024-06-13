@@ -140,17 +140,13 @@ function RegisterForm(
     const [errors, setErrors] = useState<Map<string, string[]>>(new Map());
     const handleSubmit = useRegisterHandler(setErrors, setCurrentBackdrop);
     const scopedTLoginRegister = useScopedI18n("loginRegister");
-    const scopedTUser = useScopedI18n("userFields")
     return (
         <Box onClick={(e) => e.stopPropagation()}
              className="bg-white w-[30dvw] h-[50dvh] rounded-xl flex justify-center items-center flex-col gap-2">
             <Typography variant="h5">{scopedTLoginRegister("registerTitle")}</Typography>
             <Box component="form" onSubmit={handleSubmit}
                  className="flex flex-col gap-2">
-                <ErrorFormHelper errors={errors} field="username"/>
-                <TextField name="username" label={scopedTUser("username")} aria-describedby="username-helper"/>
-                <ErrorFormHelper errors={errors} field="password"/>
-                <TextField name="password" label={scopedTUser("password")} aria-describedby="password-helper"/>
+                <SharedFields errors={errors}/>
                 <Button variant="contained" type="submit">{scopedTLoginRegister("register")}</Button>
             </Box>
             <Button variant="text" style={{
