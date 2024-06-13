@@ -4,14 +4,14 @@ import React, {useState} from "react";
 import {useScopedI18n} from "@/config/locales/client";
 import {post} from "@/app/[locale]/_util/fetching";
 import ErrorResponse, {toMap} from "@/app/_models/Error";
-import {Backdrop, Button, IconButton, TextField, Typography} from "@mui/material";
+import {Backdrop, Button, IconButton, Stack, TextField, Typography} from "@mui/material";
 import {Box} from "@mui/system";
 import {useRouter} from "next/navigation";
 
 import {ErrorFormHelper} from "@/app/[locale]/_util/components-client";
 import {AppRouterInstance} from "next/dist/shared/lib/app-router-context.shared-runtime";
 import {useLoggedIn} from "@/app/[locale]/@header/_userBar/user-bar";
-import {Visibility, VisibilityOff} from "@mui/icons-material";
+import {Check, Close, Visibility, VisibilityOff} from "@mui/icons-material";
 import {breakpoints} from "@/config/theme";
 import {useWindowSize} from "@/app/[locale]/_util/hooks";
 
@@ -159,13 +159,22 @@ const mdDown = {
     }
 }
 
-function Container({children, errorsPresent}: { children: React.ReactNode, errorsPresent: boolean }) {
+function Container(
+    {
+        children,
+        errorsPresent,
+        heightVariants
+    }: {
+        children: React.ReactNode, errorsPresent: boolean,
+        heightVariants?: { errors: string, noErrors: string }
+    }) {
     const currentDimensions = useWindowSize()[0] > breakpoints.values.md ? mdUp : mdDown;
     return (
         <Box onClick={(e) => e.stopPropagation()}
              className={`bg-white 
-                 ${errorsPresent ? `${currentDimensions.width.errors} ${currentDimensions.height.errors}`
-                 : `${currentDimensions.width.noErrors} ${currentDimensions.height.noErrors}`}  
+                 ${errorsPresent ?
+                 `${currentDimensions.width.errors} ${heightVariants?.errors ?? currentDimensions.height.errors}` :
+                 `${currentDimensions.width.noErrors} ${heightVariants?.noErrors ?? currentDimensions.height.noErrors}`}  
                      rounded-xl flex justify-center items-center flex-col gap-2`}>
             {children}
         </Box>
@@ -182,12 +191,18 @@ function RegisterForm(
     const [errors, setErrors] = useState<Map<string, string[]>>(new Map());
     const handleSubmit = useRegisterHandler(setErrors, setCurrentBackdrop);
     const scopedTLoginRegister = useScopedI18n("loginRegister");
+    const [passwordValue, setPasswordValue] = useState("");
+
     return (
-        <Container errorsPresent={errors.size > 0}>
+        <Container errorsPresent={errors.size > 0} heightVariants={{
+            errors: "h-[80dvh]",
+            noErrors: "h-[70dvh]"
+        }}>
             <Typography variant="h5">{scopedTLoginRegister("registerTitle")}</Typography>
             <Box component="form" onSubmit={handleSubmit}
                  className="flex flex-col gap-2 w-4/5">
-                <SharedFields errors={errors}/>
+                <SharedFields errors={errors} setPasswordValue={setPasswordValue}/>
+                <PasswordChecklist passwordValue={passwordValue}/>
                 <ErrorFormHelper errors={errors} field={"passwordConfirmation"}
                                  fieldNameSource={useScopedI18n("userFormFields") as (field: string) => string}/>
                 <PasswordInput label="passwordConfirmation"/>
@@ -202,11 +217,16 @@ function RegisterForm(
     )
 }
 
-function PasswordInput({label}: { label: string }) {
+function PasswordInput({label, setPasswordValue}: { label: string, setPasswordValue?: (value: string) => void }) {
     const [showPassword, setShowPassword] = useState(false);
     const scopedT = useScopedI18n("userFormFields");
 
     return <TextField name={label}
+                      onChange={(e) => {
+                          if (setPasswordValue) {
+                              setPasswordValue(e.target.value ?? "");
+                          }
+                      }}
                       label={scopedT(label as never)}
                       aria-describedby="password-helper"
                       InputProps={{
@@ -220,7 +240,42 @@ function PasswordInput({label}: { label: string }) {
     />;
 }
 
-function SharedFields({errors}: { errors: Map<string, string[]> }) {
+function PasswordChecklist({passwordValue}: { passwordValue: string }) {
+    const scopedT
+        = useScopedI18n("loginRegister.passwordRequirements");
+    if (passwordValue.length === 0) {
+        return null;
+    }
+    return (
+        <Stack gap={0.05}>
+            <ChecklistItem checked={passwordValue.length >= 8} text={scopedT("length")}/>
+            <ChecklistItem checked={/[A-Z]/.test(passwordValue)} text={scopedT("uppercase")}/>
+            <ChecklistItem checked={/[a-z]/.test(passwordValue)} text={scopedT("lowercase")}/>
+            <ChecklistItem checked={/[0-9]/.test(passwordValue)} text={scopedT("digit")}/>
+            <ChecklistItem checked={/[^A-Za-z0-9]/.test(passwordValue)} text={scopedT("specialCharacter")}/>
+        </Stack>
+    );
+}
+
+function ChecklistItem({checked, text}: { checked: boolean, text: string }) {
+    return (
+        <Box className="flex gap-2 items-center">
+            { /* @ts-ignore */}
+            {checked ? <Check color="success" fontSize="12px"/> : <Close color="error" fontSize="12px"/>}
+            <Typography variant="caption" color={checked ? "green" : "red"}>{text}</Typography>
+        </Box>
+    );
+}
+
+
+function SharedFields(
+    {
+        errors,
+        setPasswordValue,
+    }: {
+        errors: Map<string, string[]>,
+        setPasswordValue?: (value: string) => void
+    }) {
     const scopedT = useScopedI18n("userFormFields");
     return <>
         <ErrorFormHelper errors={errors} field="username"
@@ -228,7 +283,7 @@ function SharedFields({errors}: { errors: Map<string, string[]> }) {
         <TextField name="username" label={scopedT("username")} aria-describedby="username-helper"/>
         <ErrorFormHelper errors={errors} field="password"
                          fieldNameSource={scopedT as (field: string) => string}/>
-        <PasswordInput label="password"/>
+        <PasswordInput label="password" setPasswordValue={setPasswordValue}/>
     </>;
 }
 

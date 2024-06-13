@@ -24,6 +24,13 @@ const uk = {
         dontHaveAnAccount: 'Не маєте акаунту? Зареєструватися',
         alreadyHaveAnAccount: 'Вже маєте акаунт? Увійти',
         logout: 'Вийти',
+        passwordRequirements: {
+            length: 'Мінімум 8 символів',
+            uppercase: 'Одна велика латинська літера',
+            lowercase: 'Одна маленька латинська літера',
+            digit: 'Одна цифра',
+            specialCharacter: 'Один спеціальний символ',
+        }
     },
     selectedNoteError: {
         noteNotFound: 'Нотатка не знайдена',

@@ -20,6 +20,13 @@ const en = {
         dontHaveAnAccount: 'Don\'t have an account? Register',
         alreadyHaveAnAccount: 'Already have an account? Login',
         logout: 'Logout',
+        passwordRequirements: {
+            length: 'At least 8 characters',
+            uppercase: 'One latin uppercase letter',
+            lowercase: 'One latin lowercase letter',
+            digit: 'One digit',
+            specialCharacter: 'One special character',
+        }
     },
     selectedNoteError: {
         noteNotFound: 'Note not found',
