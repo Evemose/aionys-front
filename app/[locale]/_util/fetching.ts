@@ -1,4 +1,3 @@
-import * as process from "node:process";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -11,6 +10,9 @@ function getDefaultHeaders() {
     if (typeof window === 'undefined') {
         const {cookies} = require('next/headers');
         headers['Cookie'] = cookies().toString();
+    }
+    if (process.env.NEXT_PUBLIC_ACTIVE_PROFILE === "dev" && typeof localStorage !== 'undefined') {
+        headers['Authorization'] = "Bearer " + localStorage.getItem('token') || '';
     }
     return headers;
 }

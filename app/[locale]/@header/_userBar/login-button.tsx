@@ -10,6 +10,7 @@ import {useRouter} from "next/navigation";
 
 import {ErrorFormHelper} from "@/app/[locale]/_util/components-client";
 import {AppRouterInstance} from "next/dist/shared/lib/app-router-context.shared-runtime";
+import {useLoggedIn} from "@/app/[locale]/@header/_userBar/user-bar";
 
 const enum BackdropType {
     Login = "login",
@@ -21,7 +22,8 @@ const login = async (
     form: HTMLFormElement,
     router: AppRouterInstance,
     setCurrentBackdrop: (value: BackdropType) => void,
-    handleErrors: (response: Response) => Promise<void>
+    handleErrors: (response: Response) => Promise<void>,
+    setLoggedIn: (value: boolean) => void
 ) => {
     const formData = new FormData(form);
     const response = await post("/login", {},
@@ -31,6 +33,16 @@ const login = async (
         return;
     }
     setCurrentBackdrop(BackdropType.None);
+
+    if (process.env.NEXT_PUBLIC_ACTIVE_PROFILE === "dev") {
+        const token = await response.text();
+        // this is NOT SECURE in any possible way and auth should only rely on httpOnly cookies
+        // unfortunately, when ran in docker, server and client are on different hosts
+        // so cookies require SameSite=None and Secure, which require HTTPS
+        // for production purposes, it is recommended to use https connection and httpOnly cookies
+        localStorage.setItem("token", token);
+    }
+    setLoggedIn(true);
     router.refresh();
 };
 
@@ -39,6 +51,7 @@ function useLoginHandler(
     setCurrentBackdrop: (value: BackdropType) => void,
     ) {
     const router = useRouter();
+    const setLoggedIn = useLoggedIn(state => state.setLoggedIn);
 
     async function handleErrors(response: Response) {
         if (response.status == 400) {
@@ -53,7 +66,7 @@ function useLoginHandler(
 
     return async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        await login(e.currentTarget, router, setCurrentBackdrop, handleErrors);
+        await login(e.currentTarget, router, setCurrentBackdrop, handleErrors, setLoggedIn);
     }
 }
 
@@ -85,6 +98,7 @@ function useRegisterHandler(
     setErrors: (value: Map<string, string[]>) => void,
     setCurrentBackdrop: (value: BackdropType) => void) {
     const router = useRouter();
+    const setLoggedIn = useLoggedIn(state => state.setLoggedIn);
 
     async function handleErrors(response: Response) {
         if (response.status == 400 || response.status == 409) {
@@ -111,7 +125,7 @@ function useRegisterHandler(
             return;
         }
 
-        await login(form, router, setCurrentBackdrop, handleErrors);
+        await login(form, router, setCurrentBackdrop, handleErrors, setLoggedIn);
     };
 }
 

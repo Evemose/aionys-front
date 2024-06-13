@@ -4,7 +4,7 @@ import RootContext from "@/app/[locale]/_util/root-context";
 import {Box} from "@mui/material";
 import NotesListProvider from "@/app/[locale]/@notesList/notes-context";
 import Note from "@/app/_models/Note";
-import {LoggedInOnlyContainer} from "@/app/[locale]/_util/components";
+import {LoggedInOnlyContainer} from "@/app/[locale]/_util/components-client";
 import {cookies} from "next/headers";
 
 export default function LocaleLayout(

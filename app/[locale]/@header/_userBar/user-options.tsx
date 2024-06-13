@@ -1,37 +1,35 @@
 "use client"
 
 import React, {useRef, useState} from "react";
-import {
-    Button,
-    Menu,
-    MenuItem,
-    Typography
-} from "@mui/material";
+import {Button, Menu, MenuItem, Typography} from "@mui/material";
 import {ExpandMore} from "@mui/icons-material";
 import Cookie from "js-cookie";
 import {useRouter} from "next/navigation";
-import {useCurrentLocale, useScopedI18n} from "@/config/locales/client";
+import {useScopedI18n} from "@/config/locales/client";
 import {useSWRConfig} from "swr";
+import {useLoggedIn} from "@/app/[locale]/@header/_userBar/user-bar";
 
 function LogoutButton() {
     const router = useRouter();
-    const currentLocale = useCurrentLocale();
     const scopedT = useScopedI18n("loginRegister");
     const {mutate} = useSWRConfig();
+    const setLoggedIn = useLoggedIn(state => state.setLoggedIn);
 
     return <Button className="normal-case w-full justify-start" variant="outlined">
         <Typography variant="body1" onClick={(e) => {
             e.preventDefault();
-            Cookie.remove("BearerTail");
-
             // clear cache because otherwise SWR will treat first request as still authenticated
             // and use old cookies for some reason
             mutate(
                 _ => true,
                 undefined,
-                { revalidate: false }
+                {revalidate: false}
             ).then(() => {
-                router.push(`/${currentLocale}`);
+                setLoggedIn(false);
+                Cookie.remove("BearerTail");
+                if (process.env.NEXT_PUBLIC_ACTIVE_PROFILE === "dev") {
+                    localStorage.removeItem("token");
+                }
                 router.refresh();
             });
         }}>{scopedT("logout")}</Typography>
