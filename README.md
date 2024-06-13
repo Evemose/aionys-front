@@ -24,8 +24,7 @@ Clone the parent repository along with its submodules:
 git clone --recurse-submodules <repository-url>
 cd project-root/front
 ```
-2. Create the .env File
-3. 
+# 2. Create the .env File
 Copy the .env-template file to create the required .env file:
 
 ```sh
