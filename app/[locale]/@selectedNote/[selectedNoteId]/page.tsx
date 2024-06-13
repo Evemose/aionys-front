@@ -15,6 +15,8 @@ import {ErrorFormHelper, Timestamp} from "@/app/[locale]/_util/components-client
 import {Container} from "@/app/[locale]/@selectedNote/[selectedNoteId]/container";
 import Link from "next/link";
 import {create} from "zustand";
+import {useWindowSize} from "@/app/[locale]/_util/hooks";
+import {breakpoints} from "@/config/theme";
 
 function EditOrSaveButton({isEditing, setEditing}: {
     isEditing: boolean,
@@ -122,6 +124,7 @@ function SelectedNote() {
     const [loading, setLoading] = useState(true);
     const scopedT = useScopedI18n("noteFields");
     const [errors, setErrors] = useState(new Map<string, string[]>());
+    const windowWidth = useWindowSize()[0];
 
     const editableProps = new Map<string, any>([
         ["title", {
@@ -147,7 +150,25 @@ function SelectedNote() {
 
     // avoid unnecessary rendering and errors while awaiting redirect
     if (resetCalled) {
-        return <Container />;
+        return <Container/>;
+    }
+
+    async function handleEditSubmit(e: React.FormEvent<HTMLFormElement>) {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        const response = await patch(`/notes/${noteId}`, {
+            title: formData.get("title") as string,
+            content: formData.get("content") as string
+        });
+
+        if (!response.ok) {
+            setErrors(toMap(await response.json()));
+            return;
+        }
+
+        setErrors(new Map<string, string[]>());
+        update(Note.fromResponseData(await response.json()));
+        setEditing(false);
     }
 
     return (
@@ -155,28 +176,14 @@ function SelectedNote() {
             {
                 // very rarely note is already deleted, but guard clause is not triggered,
                 // so better to check note existence here also
-                !loading && note ? <Box component="form" className="flex" onSubmit={async (e) => {
-                    e.preventDefault();
-                    const formData = new FormData(e.currentTarget);
-                    const response = await patch(`/notes/${noteId}`, {
-                        title: formData.get("title") as string,
-                        content: formData.get("content") as string
-                    });
-
-                    if (!response.ok) {
-                        setErrors(toMap(await response.json()));
-                        return;
-                    }
-
-                    setErrors(new Map<string, string[]>());
-                    update(Note.fromResponseData(await response.json()));
-                    setEditing(false);
-                }}>
+                !loading && note ? <Box component="form" className="flex" onSubmit={handleEditSubmit}>
                     <NoteFormFields note={note} FieldComponentType={isEditing ? TextField : Typography} fieldProps={
                         isEditing ? editableProps : nonEditableProps
                     } errors={errors}/>
-                    <EditOrSaveButton isEditing={isEditing} setEditing={setEditing}/>
-                    <DeleteButton />
+                    <Box className={`flex ${windowWidth > breakpoints.values.md ? "flex-row" : "flex-col"}`}>
+                        <EditOrSaveButton isEditing={isEditing} setEditing={setEditing}/>
+                        <DeleteButton/>
+                    </Box>
                 </Box> : <LoadingSelectedNote box/>
             }
         </Container>
@@ -189,7 +196,7 @@ const useSelectedNoteId = create<{
     resetCalled: boolean,
     clearSelectedNoteId: () => void,
     setSelectedNoteId: (selectedNoteId: number) => void
-}>((set) =>({
+}>((set) => ({
     selectedNoteId: null,
     resetCalled: false,
     clearSelectedNoteId: () => set({selectedNoteId: null, resetCalled: true}),
@@ -199,6 +206,6 @@ const useSelectedNoteId = create<{
 export default function NoteMaximized({params}: { params: { selectedNoteId: string } }) {
     const setSelectedNoteId = useSelectedNoteId(state => state.setSelectedNoteId);
     setSelectedNoteId(Number(params.selectedNoteId));
-    return <SelectedNote />
+    return <SelectedNote/>
 }
 

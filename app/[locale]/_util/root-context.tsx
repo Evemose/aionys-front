@@ -9,7 +9,7 @@ export default function RootContext({children}: { children: React.ReactNode }) {
     return (
         <I18nProviderClient locale={currentLocale}>
             <ThemeProvider theme={theme}>
-                    {children}
+                {children}
             </ThemeProvider>
         </I18nProviderClient>
     )

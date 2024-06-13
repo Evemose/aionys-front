@@ -9,7 +9,7 @@ import {useLoggedIn} from "@/app/[locale]/@header/_userBar/user-bar";
 export function ErrorFormHelper({errors, field, fieldNameSource}: {
     errors: Map<string, string[]>,
     field: any,
-    fieldNameSource : (field: string) => string
+    fieldNameSource: (field: string) => string
 }) {
     const scopedT = useScopedI18n("errors");
     return <>
@@ -31,7 +31,11 @@ export function ErrorFormHelper({errors, field, fieldNameSource}: {
 }
 
 
-export function Timestamp({createdAt, lastModifiedAt, id}: { createdAt: Date | string, lastModifiedAt: Date | string, id: string }) {
+export function Timestamp({createdAt, lastModifiedAt, id}: {
+    createdAt: Date | string,
+    lastModifiedAt: Date | string,
+    id: string
+}) {
     const scopedT = useScopedI18n("commons")
     return (
         <Typography variant="caption" id={`timestamp-${id}`}>

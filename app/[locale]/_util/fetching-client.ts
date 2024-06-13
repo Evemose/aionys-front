@@ -18,8 +18,8 @@ export const useGet = (url: string) => {
     return useSWR(BACKEND_URL + url, (url) => fetch(url, {
             method: "GET",
             credentials: "include",
-        // @ts-ignore
-        headers: getAuthorizationHeader()
+            // @ts-ignore
+            headers: getAuthorizationHeader()
         }).then(response => response.json())
     );
 }

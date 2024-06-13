@@ -11,6 +11,8 @@ import ErrorResponse, {toMap} from "@/app/_models/Error";
 
 import {ErrorFormHelper} from "@/app/[locale]/_util/components-client";
 import {Container} from "@/app/[locale]/@selectedNote/[selectedNoteId]/container";
+import {useWindowSize} from "@/app/[locale]/_util/hooks";
+import {breakpoints} from "@/config/theme";
 
 async function handlePostError(
     response: Response,
@@ -55,7 +57,8 @@ export default function AddNote() {
                            aria-label={"title-helper"}
                            name="title"
                 />
-                <ErrorFormHelper errors={errors} field={"title"} fieldNameSource={scopedTNotes as (field: string) => string}/>
+                <ErrorFormHelper errors={errors} field={"title"}
+                                 fieldNameSource={scopedTNotes as (field: string) => string}/>
                 <TextField label={scopedTNotes("content")} variant="outlined" multiline
                            sx={{display: 'flex', flexGrow: 1}}
                            aria-label={"content-helper"}
@@ -68,9 +71,11 @@ export default function AddNote() {
                            }}
                            name="content"
                 />
-                <ErrorFormHelper errors={errors} field={"content"} fieldNameSource={scopedTNotes as (field: string) => string}/>
+                <ErrorFormHelper errors={errors} field={"content"}
+                                 fieldNameSource={scopedTNotes as (field: string) => string}/>
                 <Tooltip title={scopedTCommons("save")}>
-                    <Button type="submit" color="primary" variant="contained" className="w-1/6 self-center">
+                    <Button type="submit" color="primary" variant="contained"
+                            className={`${useWindowSize()[0] > breakpoints.values.md ? "w-1/6" : "w-full"} self-center`}>
                         {scopedTCommons("save")}
                     </Button>
                 </Tooltip>

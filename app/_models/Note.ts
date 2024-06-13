@@ -1,4 +1,4 @@
-import { z } from "zod";
+import {z} from "zod";
 import {get} from "@/app/[locale]/_util/fetching";
 
 export default class Note {

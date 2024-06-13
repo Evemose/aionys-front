@@ -12,6 +12,8 @@ import {ErrorFormHelper} from "@/app/[locale]/_util/components-client";
 import {AppRouterInstance} from "next/dist/shared/lib/app-router-context.shared-runtime";
 import {useLoggedIn} from "@/app/[locale]/@header/_userBar/user-bar";
 import {Visibility, VisibilityOff} from "@mui/icons-material";
+import {breakpoints} from "@/config/theme";
+import {useWindowSize} from "@/app/[locale]/_util/hooks";
 
 const enum BackdropType {
     Login = "login",
@@ -50,7 +52,7 @@ const login = async (
 function useLoginHandler(
     setErrors: (value: Map<string, string[]>) => void,
     setCurrentBackdrop: (value: BackdropType) => void,
-    ) {
+) {
     const router = useRouter();
     const setLoggedIn = useLoggedIn(state => state.setLoggedIn);
 
@@ -135,6 +137,41 @@ function useRegisterHandler(
     };
 }
 
+const mdUp = {
+    height: {
+        errors: "h-[60dvh]",
+        noErrors: "h-[50dvh]"
+    },
+    width: {
+        errors: "w-[40dvw]",
+        noErrors: "w-[30dvw]"
+    }
+}
+
+const mdDown = {
+    height: {
+        errors: "h-[80dvh]",
+        noErrors: "h-[70dvh]"
+    },
+    width: {
+        errors: "w-[80dvw]",
+        noErrors: "w-[70dvw]"
+    }
+}
+
+function Container({children, errorsPresent}: { children: React.ReactNode, errorsPresent: boolean }) {
+    const currentDimensions = useWindowSize()[0] > breakpoints.values.md ? mdUp : mdDown;
+    return (
+        <Box onClick={(e) => e.stopPropagation()}
+             className={`bg-white 
+                 ${errorsPresent ? `${currentDimensions.width.errors} ${currentDimensions.height.errors}`
+                 : `${currentDimensions.width.noErrors} ${currentDimensions.height.noErrors}`}  
+                     rounded-xl flex justify-center items-center flex-col gap-2`}>
+            {children}
+        </Box>
+    );
+}
+
 function RegisterForm(
     {
         setCurrentBackdrop
@@ -146,10 +183,7 @@ function RegisterForm(
     const handleSubmit = useRegisterHandler(setErrors, setCurrentBackdrop);
     const scopedTLoginRegister = useScopedI18n("loginRegister");
     return (
-        <Box onClick={(e) => e.stopPropagation()}
-             className={`bg-white 
-             ${errors.size > 0 ? "w-[40dvw]" : "w-[30dvw]"} 
-             ${errors.size > 0 ? "h-[60dvh]" : "h-[50dvh]"} rounded-xl flex justify-center items-center flex-col gap-2`}>
+        <Container errorsPresent={errors.size > 0}>
             <Typography variant="h5">{scopedTLoginRegister("registerTitle")}</Typography>
             <Box component="form" onSubmit={handleSubmit}
                  className="flex flex-col gap-2 w-4/5">
@@ -164,11 +198,11 @@ function RegisterForm(
             }} onClick={() => setCurrentBackdrop(BackdropType.Login)}>
                 {scopedTLoginRegister("alreadyHaveAnAccount")}
             </Button>
-        </Box>
+        </Container>
     )
 }
 
-function PasswordInput({label} : {label: string}) {
+function PasswordInput({label}: { label: string }) {
     const [showPassword, setShowPassword] = useState(false);
     const scopedT = useScopedI18n("userFormFields");
 
@@ -190,10 +224,10 @@ function SharedFields({errors}: { errors: Map<string, string[]> }) {
     const scopedT = useScopedI18n("userFormFields");
     return <>
         <ErrorFormHelper errors={errors} field="username"
-                         fieldNameSource={scopedT as (field: string) => string} />
+                         fieldNameSource={scopedT as (field: string) => string}/>
         <TextField name="username" label={scopedT("username")} aria-describedby="username-helper"/>
         <ErrorFormHelper errors={errors} field="password"
-                         fieldNameSource={scopedT as (field: string) => string} />
+                         fieldNameSource={scopedT as (field: string) => string}/>
         <PasswordInput label="password"/>
     </>;
 }
@@ -210,8 +244,7 @@ function LoginForm(
     const handleSubmit = useLoginHandler(setErrors, setCurrentBackdrop);
     const scopedTLoginRegister = useScopedI18n("loginRegister");
     return (
-        <Box onClick={(e) => e.stopPropagation()}
-             className="bg-white w-[30dvw] h-[50dvh] rounded-xl flex justify-center items-center flex-col gap-2">
+        <Container errorsPresent={errors.size > 0}>
             <Typography variant="h5">{scopedTLoginRegister("login")}</Typography>
             <Box component="form" onSubmit={handleSubmit}
                  className="flex flex-col gap-2">
@@ -223,6 +256,6 @@ function LoginForm(
             }} onClick={() => setCurrentBackdrop(BackdropType.Register)}>
                 {scopedTLoginRegister("dontHaveAnAccount")}
             </Button>
-        </Box>
+        </Container>
     )
 }
