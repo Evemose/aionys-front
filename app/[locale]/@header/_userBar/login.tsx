@@ -116,6 +116,11 @@ function useRegisterHandler(
         const form = e.currentTarget;
         const formData = new FormData(form);
 
+        if (formData.get("password") !== formData.get("passwordConfirmation")) {
+            setErrors(new Map([["passwordConfirmation", ["Passwords do not match"]]]));
+            return;
+        }
+
         const response = await post("/register", {
             username: formData.get("username"),
             password: formData.get("password")
@@ -147,6 +152,8 @@ function RegisterForm(
             <Box component="form" onSubmit={handleSubmit}
                  className="flex flex-col gap-2">
                 <SharedFields errors={errors}/>
+                <ErrorFormHelper errors={errors} field={"passwordConfirmation"}/>
+                <PasswordInput label="passwordConfirmation"/>
                 <Button variant="contained" type="submit">{scopedTLoginRegister("register")}</Button>
             </Box>
             <Button variant="text" style={{
@@ -158,12 +165,12 @@ function RegisterForm(
     )
 }
 
-function PasswordInput() {
+function PasswordInput({label} : {label: string}) {
     const [showPassword, setShowPassword] = useState(false);
-    const scopedT = useScopedI18n("userFields");
+    const scopedT = useScopedI18n("userFormFields");
 
-    return <TextField name="password"
-                      label={scopedT("password")}
+    return <TextField name={label}
+                      label={scopedT(label as never)}
                       aria-describedby="password-helper"
                       InputProps={{
                           endAdornment: (
@@ -177,12 +184,12 @@ function PasswordInput() {
 }
 
 function SharedFields({errors}: { errors: Map<string, string[]> }) {
-    const scopedT = useScopedI18n("userFields");
+    const scopedT = useScopedI18n("userFormFields");
     return <>
         <ErrorFormHelper errors={errors} field="username"/>
         <TextField name="username" label={scopedT("username")} aria-describedby="username-helper"/>
         <ErrorFormHelper errors={errors} field="password"/>
-        <PasswordInput/>
+        <PasswordInput label="password"/>
     </>;
 }
 

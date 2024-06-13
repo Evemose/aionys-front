@@ -32,9 +32,10 @@ const uk = {
         title: 'Заголовок',
         content: 'Текст',
     },
-    userFields: {
+    userFormFields: {
         username: 'Ім\'я користувача',
         password: 'Пароль',
+        passwordConfirmation: 'Підтвердіть пароль',
     }
 }
 

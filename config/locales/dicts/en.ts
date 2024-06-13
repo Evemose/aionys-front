@@ -28,9 +28,10 @@ const en = {
         title: 'Title',
         content: 'Content',
     },
-    userFields: {
+    userFormFields: {
         username: 'Username',
         password: 'Password',
+        passwordConfirmation: 'Confirm password',
     }
 }
 
